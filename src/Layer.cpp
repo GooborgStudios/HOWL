@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cassert>
 
-#include "Helpers.h"
+#include "NightwaveCore/Helpers.h"
 #include "Project.h"
 
 using namespace HOWL;
