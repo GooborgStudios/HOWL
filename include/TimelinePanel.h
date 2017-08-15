@@ -57,8 +57,8 @@ namespace HOWL {
 			int labelsize;
 			int ticksPerCol;
 			bool headerclicked = false;
-			Project *activeProject;
-			wxWindowID playheadMovedTarget;
+			Project *activeProject = NULL;
+			wxWindowID playheadMovedTarget = NULL;
 		
 			int playhead_in_pixels();
 			wxPoint offset_in_pixels();
