@@ -32,8 +32,6 @@ set(BUILD ${PROJECT_BINARY_DIR})
 include_directories(${ROOT})
 include_directories(${INCL})
 
-include_directories(~/local/include)
-
 add_library(HOWL SHARED
 	${SRC}/Layer.cpp ${INCL}/Layer.h
 	${SRC}/Project.cpp ${INCL}/Project.h
@@ -48,10 +46,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${wxConfig_CXX_FLAGS}")
 include(${wxWidgets_USE_FILE})
 target_link_libraries(HOWL ${wxWidgets_LIBRARIES})
 
-target_link_libraries(HOWL "-L$ENV{HOME}/local/lib")
-target_link_libraries(HOWL nightwave_core)
+target_link_libraries(HOWL NightwaveCore)
 
-install(TARGETS HOWL DESTINATION lib/HOWL)
+install(TARGETS HOWL DESTINATION lib)
 
 file(GLOB HEADERS include/*.h)
 install(FILES ${HEADERS} DESTINATION include/HOWL)
