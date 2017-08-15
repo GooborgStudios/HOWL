@@ -83,13 +83,13 @@ std::string StringKeyframe::serialize() {
 	return *value;
 }
 
-//KeyframeSet::KeyframeSet() {
-//	this->parent = NULL;
-//}
+/*Playhead::Playhead(long startTime) {
+	currentTime = startTime;
+	seek(currentTime);
+}*/
 
 KeyframeSet::KeyframeSet(Layer *parent) {
 	this->parent = parent;
-//	seek();
 }
 
 void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
@@ -108,14 +108,31 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 }
 
 void KeyframeSet::seek(long newTime) {
-	currentTime = 0;
+	int before = 0, after = keyframes.size();
+	int i;
+	if (currentTime == newTime) return;
+	if (after == 0) return;
+	
+	currentTime = newTime;
+	
+	while (after - before > 1) {
+		i = (after-before) / 2;
+		if (keyframes[i]->time > newTime) after = i+1;
+		else if (keyframes[i+1]->time <= newTime) before = i;
+		else if (keyframes[i]->time == newTime) break;
+	}
+	
+	prevKF = keyframes.begin() + i;
+	nextKF = keyframes.begin() + (i+1);
+	
+	/*currentTime = 0;
 	prevKF = keyframes.begin();
 	if (prevKF != keyframes.end()) {
 		nextKF = std::next(prevKF, 1);
 	} else {
 		nextKF = keyframes.end();
 	}
-	advanceFrame(newTime);
+	advanceFrame(newTime);*/
 }
 
 void KeyframeSet::advanceFrame(long increment) {

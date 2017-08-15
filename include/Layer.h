@@ -62,6 +62,19 @@ namespace HOWL {
 			StringKeyframe(std::string name, long time, const char *value);
 			std::string serialize();
 	};
+	
+	/*class Playhead {
+		protected:
+			KeyframeIterator prevKF;
+			KeyframeIterator nextKF;
+			long currentTime;
+
+		public:
+			Playhead(long startTime = 0);
+		
+			void seek(long newTime);
+			void advanceFrame(long increment);
+	}*/
 
 	class KeyframeSet {
 		protected:
@@ -72,7 +85,6 @@ namespace HOWL {
 			std::vector<Keyframe *> keyframes;
 			long currentTime;
 		
-	//		KeyframeSet();
 			KeyframeSet(Layer *parent);
 		
 			void AddKeyframe(Keyframe *f);
@@ -84,7 +96,6 @@ namespace HOWL {
 			Keyframe *getSecond();
 	};
 
-	// XXX Turn this into an empty base class, and move basically everything over to a new, vector-like "KeyframeData" class
 	class Layer {
 		public:
 			Layer();
