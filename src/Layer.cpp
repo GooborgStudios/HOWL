@@ -110,29 +110,22 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 void KeyframeSet::seek(long newTime) {
 	int before = 0, after = keyframes.size();
 	int i;
+	
 	if (currentTime == newTime) return;
-	if (after == 0) return;
 	
 	currentTime = newTime;
 	
+	if (after == 0) return;
+	
 	while (after - before > 1) {
-		i = (after-before) / 2;
+		i = before + (after-before) / 2;
 		if (keyframes[i]->time > newTime) after = i+1;
 		else if (keyframes[i+1]->time <= newTime) before = i;
-		else if (keyframes[i]->time == newTime) break;
+		else if (keyframes[i]->time <= newTime) break;
 	}
 	
 	prevKF = keyframes.begin() + i;
 	nextKF = keyframes.begin() + (i+1);
-	
-	/*currentTime = 0;
-	prevKF = keyframes.begin();
-	if (prevKF != keyframes.end()) {
-		nextKF = std::next(prevKF, 1);
-	} else {
-		nextKF = keyframes.end();
-	}
-	advanceFrame(newTime);*/
 }
 
 void KeyframeSet::advanceFrame(long increment) {
