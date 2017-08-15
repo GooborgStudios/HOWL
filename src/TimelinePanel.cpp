@@ -16,17 +16,14 @@
 #include <wx/vscroll.h>
 #include <wx/clrpicker.h>
 
-#include "ElementIDs.h"
-#include "LightpadProject.h"
 #include "Layer.h"
-#include "DisplayPanel.h"
 
 using namespace HOWL;
 
 wxDEFINE_EVENT(HOWL::DISPLAY_REFRESH, wxCommandEvent);
 wxDEFINE_EVENT(HOWL::PLAYHEAD_MOVED, wxCommandEvent);
 
-TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id): wxHVScrolledWindow(parent, window_id, wxPoint(-1, -1), wxSize(-1, 250), wxBORDER_SUNKEN) {
+TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project): wxHVScrolledWindow(parent, window_id, wxPoint(-1, -1), wxSize(-1, 250), wxBORDER_SUNKEN) {
 	m_parent = parent;
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	
@@ -34,21 +31,29 @@ TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id): wxHVScrolle
 	colsize = 80;
 	headersize = 30;
 	labelsize = 40;
-	ticksPerCol = activeProject->ticksPerBeat / 4;
 	active_button = wxPoint(0, 0);
 	
-	int rows = 0;
-	for (auto l: activeProject->layers) rows += l->keyframes.size();
-	
-	SetRowColumnCount(rows, 1);
-	
-	Update();
-	
-	movePlayhead(0);
+	setProject(project);
 }
 
 TimelinePanel::~TimelinePanel() {
 	
+}
+
+void TimelinePanel::setProject(Project *project) {
+	activeProject = project;
+	ticksPerCol = activeProject->ticksPerBeat / 4;
+	
+	int rows = 0;
+	for (auto l: activeProject->layers) rows += l->keyframes.size();
+	SetRowColumnCount(rows, 1);
+	
+	Update();
+	movePlayhead(0);
+}
+
+void TimelinePanel::setPlayheadMovedTarget(wxWindowID playheadMovedTarget) {
+	this->playheadMovedTarget = playheadMovedTarget;
 }
 
 void TimelinePanel::paintEvent(wxPaintEvent &WXUNUSED(event)) {
@@ -235,14 +240,16 @@ void TimelinePanel::nextQuarterBeat() {
 void TimelinePanel::movePlayhead(int time) {
 	int phCol = time / ticksPerCol;
 	activeProject->seek(time);
-	
-	wxCommandEvent fin_evt(PLAYHEAD_MOVED, ID_Panel_Display);
-	fin_evt.SetEventObject(this);
-	wxPostEvent(wxWindow::FindWindowById(ID_Panel_Display), fin_evt);
 	playhead = time;
 	
 	if (phCol >= GetVisibleEnd().GetCol() || phCol < GetVisibleBegin().GetCol()) {
 		ScrollToColumn(phCol == 0 ? 0 : phCol - 1);
+	}
+	
+	if (playheadMovedTarget) {
+		wxCommandEvent fin_evt(PLAYHEAD_MOVED, playheadMovedTarget);
+		fin_evt.SetEventObject(this);
+		wxPostEvent(wxWindow::FindWindowById(playheadMovedTarget), fin_evt);
 	}
 
 	Refresh();

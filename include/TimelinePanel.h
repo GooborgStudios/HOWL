@@ -22,8 +22,10 @@ namespace HOWL {
 	// Timeline panel
 	class TimelinePanel: public wxHVScrolledWindow {
 		public:
-			TimelinePanel(wxPanel *parent, wxWindowID window_id);
+			TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project);
 			~TimelinePanel();
+			void setProject(Project *project);
+			void setPlayheadMovedTarget(wxWindowID playheadMovedTarget);
 			void paintEvent(wxPaintEvent &event);
 			void paintNow();
 			void onLeftDown(wxMouseEvent &event);
@@ -37,8 +39,8 @@ namespace HOWL {
 			void nextBeat();
 			void nextQuarterBeat();
 			void movePlayhead(int time);
-			//		void RefreshDisplay();
-			//		void ChangeNoteColor(wxCommandEvent &event);
+			// void RefreshDisplay();
+			// void ChangeNoteColor(wxCommandEvent &event);
 		
 		protected:
 			wxCoord OnGetRowHeight(size_t row) const;
@@ -55,6 +57,8 @@ namespace HOWL {
 			int labelsize;
 			int ticksPerCol;
 			bool headerclicked = false;
+			Project *activeProject;
+			wxWindowID playheadMovedTarget;
 		
 			int playhead_in_pixels();
 			wxPoint offset_in_pixels();
