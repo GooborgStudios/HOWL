@@ -19,7 +19,7 @@ install:
   - cd submodules/NightwaveCore/C++
   - mkdir build
   - cd build
-  - cmake 
+  - cmake ..
   - make
   - make install
   - cd ../../../..
