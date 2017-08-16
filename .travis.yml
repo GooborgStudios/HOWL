@@ -41,5 +41,4 @@ deploy:
   file: bin/Debug/libHOWL.dylib
   on:
     repo: VaduNightwave/HOWL
-    branch: old-seek-function
     tags: true
