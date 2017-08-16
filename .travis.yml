@@ -19,14 +19,17 @@ install:
   - cd submodules/NightwaveCore/C++
   - mkdir build
   - cd build
-  - cmake ..
-  - make
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake .. -G "Xcode"; xcodebuild -target NightwaveCore -project NightwaveCore.xcodeproj; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake ..; make; fi
   - make install
   - cd ../../../..
 
 before_script:
   - mkdir build
   - cd build
-  - cmake ..
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake .. -G "Xcode"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cmake ..; fi
 
-script: make
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcodebuild -target HOWL -project HOWL.xcodeproj; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make; fi
