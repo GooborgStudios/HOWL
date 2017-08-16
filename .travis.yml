@@ -33,3 +33,14 @@ before_script:
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcodebuild -target HOWL -project HOWL.xcodeproj; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make; fi
+
+deploy:
+  provider: releases
+  api_key:
+    secure: wd0zAwkiTurE2j1RGFrP43Te+SZ2R6KhdXk9ygaHt5PRNRjPXFtYz61/dTDFNBZDUxydgN/rhEoVrL9c/3jcLj+iIYSzcEkYBqvBhV2yq2TlBWL5/3mJsYw934/RSXvgxrABqUQZSwWCf/n7IblxF6suFOLRSPA/dqAnjfQqvDJUu07ksf09mQ4y/mb/+Pec71JmgMtszQNEXMVPMHqa0SFZ+hkcjV2STd2Kn1QSRlItoAKzyQ/NQXIESrQ5VErHihfc8RTAg5LhFTt2KDu3Hzoj6myZ5LNiXSqZCUlw4FunEseQxikAKjKvmGWrQ4O3wqSoe9bYYocV96aIvYTceSMIpo/mk2WLEQpI5Fs4TZ/IOxM1WdAtXgbqDzK82EBeRbLdUGkiwJCm386bF1LNVSjIJ4u3I5uVbpmWW0t9uOGc8qd+l1CE3nNTMVVUBSETeWokyqI52Ji203Ff5UHx9WdsDBxNMF4hGLF/AXcvcbUMpSePZrU/kc5pGwRO8q+yIM5hnfp6JkCD7sizFhBhSByt4UQL3DuS/J+XHIfP4Ikw2U4kEi4Ix8eDCunDHH57Iiwy7D9jQN2shMiCO9CvopAV3DL68RkI2SUzJ4BdzNtEzasrZ+a5ljVY69VTkK6owMyVDxiarwbyl/ATUzKPZzXLCPhCZqkM3+CtmNbsp50=
+  skip_cleanup: true
+  file: bin/Debug/libHOWL.dylib
+  on:
+    repo: VaduNightwave/HOWL
+    branch: old-seek-function
+    tags: true
