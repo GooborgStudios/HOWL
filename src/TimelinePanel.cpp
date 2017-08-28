@@ -33,8 +33,8 @@ TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *pro
 	labelsize = 40;
 	active_button = wxPoint(0, 0);
 
-	setProject(project);
 	setPlayheadMovedTarget(playheadMovedTarget);
+	setProject(project);
 }
 
 TimelinePanel::~TimelinePanel() {
