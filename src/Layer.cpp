@@ -96,7 +96,12 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 	KeyframeIterator iter = keyframes.begin();
 	
 	for (; iter != keyframes.end(); ++iter) {
-		if ( keyframe->time < (*iter)->time ) {
+		if (keyframe->time == (*iter)->time) {
+			keyframes.erase(iter);
+			keyframes.insert(iter, keyframe);
+			break;
+		}
+		if (keyframe->time < (*iter)->time) {
 			keyframes.insert(iter, keyframe);
 			break;
 		}
