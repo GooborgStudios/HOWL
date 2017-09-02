@@ -234,7 +234,7 @@ void TimelinePanel::nextBeat() {
 }
 
 void TimelinePanel::nextQuarterBeat() {
-	movePlayhead(playhead+ticksPerCol);
+	movePlayhead(playhead+(activeProject->ticksPerBeat/4));
 }
 
 void TimelinePanel::advanceCol(int cols) {
@@ -242,6 +242,7 @@ void TimelinePanel::advanceCol(int cols) {
 }
 
 void TimelinePanel::movePlayhead(int time) {
+	if (time < 0) time = 0;
 	int phCol = time / ticksPerCol;
 	activeProject->seek(time);
 	playhead = time;
