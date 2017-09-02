@@ -60,6 +60,10 @@ namespace HOWL {
 			Project *activeProject = NULL;
 			wxWindowID playheadMovedTarget = NULL;
 		
+			double colsPerBeat();
+			int measureFromCol(int col);
+			int beatFromCol(int col);
+			int divFromCol(int col);
 			int playhead_in_pixels();
 			wxPoint offset_in_pixels();
 			wxPoint mousepos_to_buttons(wxPoint mousepos);

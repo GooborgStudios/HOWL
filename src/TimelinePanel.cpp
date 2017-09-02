@@ -185,14 +185,13 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 
 std::string TimelinePanel::get_header_string(int col) {
 	char buf[16];
-	int colsPerBeat = activeProject->ticksPerBeat / ticksPerCol;
 	
-	int measure = col / (colsPerBeat * activeProject->beatsPerMeasure) + 1;
-	int beat = col / colsPerBeat % activeProject->beatsPerMeasure + 1;
-	int fb = col % colsPerBeat + 1;
-	if (beat == 1 && fb == 1) snprintf(buf, sizeof(buf), "%d", measure);
-	else if (fb == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
-	else snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, fb);
+	int measure = measureFromCol(col);
+	int beat = beatFromCol(col);
+	int div = divFromCol(col);
+	if (beat == 1 && div == 1) snprintf(buf, sizeof(buf), "%d", measure);
+	else if (div == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
+	else snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
 	
 	return std::string(buf);
 }
@@ -263,6 +262,22 @@ wxCoord TimelinePanel::OnGetRowHeight(size_t row) const {
 wxCoord TimelinePanel::OnGetColumnWidth(size_t column) const {
 	return colsize;
 	//	return wxClientDC(this).GetSize().GetX();
+}
+
+double TimelinePanel::colsPerBeat() {
+	return activeProject->ticksPerBeat / (ticksPerCol * 1.0);
+}
+
+int TimelinePanel::measureFromCol(int col) {
+	return col / (colsPerBeat() * activeProject->beatsPerMeasure) + 1;
+}
+
+int TimelinePanel::beatFromCol(int col) {
+	return (int)(col / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
+}
+
+int TimelinePanel::divFromCol(int col) {
+	return col % (int)(colsPerBeat()) + 1;
 }
 
 int TimelinePanel::playhead_in_pixels() {
