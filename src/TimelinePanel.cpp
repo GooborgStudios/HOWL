@@ -237,6 +237,10 @@ void TimelinePanel::nextQuarterBeat() {
 	movePlayhead(playhead+ticksPerCol);
 }
 
+void TimelinePanel::advanceCol(int cols) {
+	movePlayhead(playhead+(ticksPerCol*cols));
+}
+
 void TimelinePanel::movePlayhead(int time) {
 	int phCol = time / ticksPerCol;
 	activeProject->seek(time);

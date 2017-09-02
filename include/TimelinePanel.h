@@ -38,6 +38,7 @@ namespace HOWL {
 			void render_playhead(wxDC &canvas);
 			void nextBeat();
 			void nextQuarterBeat();
+			void advanceCol(int cols);
 			void movePlayhead(int time);
 			void zoom(int percent);
 			// void RefreshDisplay();
