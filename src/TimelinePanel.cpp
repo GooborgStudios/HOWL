@@ -208,7 +208,9 @@ void TimelinePanel::render_header(wxDC &canvas) {
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	
 	for (int x = labelsize; x < width; x += colsize) {
-		canvas.DrawLine(x, 0, x, headersize-2);
+		if (beatFromCol(col) == 1 && divFromCol(col) == 1) canvas.DrawLine(x, 0, x, headersize-2);
+		else if (divFromCol(col) == 1) canvas.DrawLine(x, headersize/2, x, headersize-2);
+		else canvas.DrawLine(x, headersize/4*3, x, headersize-2);
 		canvas.DrawText(get_header_string(col), x+4, 0);
 		col++;
 	}
