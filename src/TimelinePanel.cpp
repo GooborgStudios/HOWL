@@ -28,7 +28,7 @@ TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *pro
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	
 	rowsize = 20;
-	colsize = 80;
+	colsize = 40;
 	headersize = 30;
 	labelsize = 40;
 	active_button = wxPoint(0, 0);
@@ -252,6 +252,19 @@ void TimelinePanel::movePlayhead(int time) {
 		wxPostEvent(wxWindow::FindWindowById(playheadMovedTarget), fin_evt);
 	}
 
+	Refresh();
+}
+
+void TimelinePanel::zoom(int percent) {
+	colsize = colsize * percent / 100;
+	if (colsize <= 10) {
+		ticksPerCol *= 4;
+		colsize = 40;
+	}
+	if (colsize >= 160) {
+		ticksPerCol /= 4;
+		colsize = 40;
+	}
 	Refresh();
 }
 

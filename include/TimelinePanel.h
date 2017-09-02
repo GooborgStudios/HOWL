@@ -39,6 +39,7 @@ namespace HOWL {
 			void nextBeat();
 			void nextQuarterBeat();
 			void movePlayhead(int time);
+			void zoom(int percent);
 			// void RefreshDisplay();
 			// void ChangeNoteColor(wxCommandEvent &event);
 		
