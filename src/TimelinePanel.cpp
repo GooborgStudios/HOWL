@@ -44,6 +44,7 @@ TimelinePanel::~TimelinePanel() {
 void TimelinePanel::setProject(Project *project) {
 	activeProject = project;
 	ticksPerCol = activeProject->ticksPerBeat / 4;
+	colsize = 40;
 	
 	int rows = 0;
 	for (auto l: activeProject->layers) rows += l->keyframes.size();
@@ -183,17 +184,25 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 	canvas.DrawLine(bounding_box.GetBottomLeft(), bounding_box.GetBottomRight());
 }
 
-std::string TimelinePanel::get_header_string(int col) {
+void TimelinePanel::render_header_segment(wxDC &canvas, int col, int xpos) {
 	char buf[16];
+	int divsPerBeat = 4;
+	int measure = col / (colsPerBeat() * activeProject->beatsPerMeasure) + 1;
+	int beat = (int)(col / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
+	int div = (int)(col * divsPerBeat / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
+	int tick = (col * ticksPerCol) % (activeProject->ticksPerBeat / divsPerBeat) + 1;
+
+	if (beat == 1 && div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d", measure);
+	else if (div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
+	else if (tick == 1) snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
+	else snprintf(buf, sizeof(buf), "%d.%d.%d.%d", measure, beat, div, tick);
 	
-	int measure = measureFromCol(col);
-	int beat = beatFromCol(col);
-	int div = divFromCol(col);
-	if (beat == 1 && div == 1) snprintf(buf, sizeof(buf), "%d", measure);
-	else if (div == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
-	else snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
-	
-	return std::string(buf);
+	canvas.DrawText(buf, xpos+4, 0);
+
+	if (beat == 1 && div == 1 && tick == 1) canvas.DrawLine(xpos, 0, xpos, headersize-2);
+	else if (div == 1 && tick == 1) canvas.DrawLine(xpos, headersize/2, xpos, headersize-2);
+	else if (tick == 1) canvas.DrawLine(xpos, headersize/4*3, xpos, headersize-2);
+	else canvas.DrawLine(xpos, headersize-6, xpos, headersize-2);
 }
 
 void TimelinePanel::render_header(wxDC &canvas) {
@@ -208,10 +217,7 @@ void TimelinePanel::render_header(wxDC &canvas) {
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	
 	for (int x = labelsize; x < width; x += colsize) {
-		if (beatFromCol(col) == 1 && divFromCol(col) == 1) canvas.DrawLine(x, 0, x, headersize-2);
-		else if (divFromCol(col) == 1) canvas.DrawLine(x, headersize/2, x, headersize-2);
-		else canvas.DrawLine(x, headersize/4*3, x, headersize-2);
-		canvas.DrawText(get_header_string(col), x+4, 0);
+		render_header_segment(canvas, col, x);
 		col++;
 	}
 	
@@ -263,14 +269,17 @@ void TimelinePanel::movePlayhead(int time) {
 }
 
 void TimelinePanel::zoom(int percent) {
+	if ((ticksPerCol <= 1 && percent > 100) || (ticksPerCol >= pow(2, 27) && percent < 100)) return;
 	colsize = colsize * percent / 100;
 	if (colsize <= 10) {
 		ticksPerCol *= 4;
-		colsize = 40;
+		if (ticksPerCol > pow(2, 27)) ticksPerCol = pow(2, 27);
+		else colsize = 40;
 	}
 	if (colsize >= 160) {
 		ticksPerCol /= 4;
-		colsize = 40;
+		if (ticksPerCol < 1) ticksPerCol = 1;
+		else colsize = 40;
 	}
 	Refresh();
 }
@@ -297,7 +306,11 @@ int TimelinePanel::beatFromCol(int col) {
 }
 
 int TimelinePanel::divFromCol(int col) {
-	return col % (int)(colsPerBeat()) + 1;
+	return (int)(col * 4 / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
+}
+
+int TimelinePanel::tickFromCol(int col) {
+	return (col * ticksPerCol) % activeProject->beatsPerMeasure + 1;
 }
 
 int TimelinePanel::playhead_in_pixels() {

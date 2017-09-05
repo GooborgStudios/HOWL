@@ -33,7 +33,7 @@ namespace HOWL {
 			void onLeftUp(wxMouseEvent &event);
 			void render(wxDC &canvas);
 			void render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box);
-			std::string get_header_string(int col);
+			void render_header_segment(wxDC &canvas, int col, int xpos);
 			void render_header(wxDC &canvas);
 			void render_playhead(wxDC &canvas);
 			void nextBeat();
@@ -66,6 +66,7 @@ namespace HOWL {
 			int measureFromCol(int col);
 			int beatFromCol(int col);
 			int divFromCol(int col);
+			int tickFromCol(int col);
 			int playhead_in_pixels();
 			wxPoint offset_in_pixels();
 			wxPoint mousepos_to_buttons(wxPoint mousepos);
