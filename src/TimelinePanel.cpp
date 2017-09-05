@@ -142,8 +142,8 @@ void TimelinePanel::render(wxDC &canvas) {
 	render_header(canvas);
 	render_playhead(canvas);
 	
-	canvas.SetPen(wxPen(*wxBLACK, 2));
-	canvas.SetBrush(*wxWHITE_BRUSH);
+	canvas.SetPen(wxPen(*wxWHITE, 2));
+	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	int left = active_button.x * colsize + xpos;
 	int top = active_button.y * rowsize + ypos;
 	if (left >= labelsize && top >= headersize) canvas.DrawRectangle(left, top, colsize, rowsize);
