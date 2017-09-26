@@ -22,6 +22,7 @@
 #include <map>
 #include <cmath>
 #include <cassert>
+#include <utility>
 
 #include "NightwaveCore/Helpers.h"
 #include "Project.h"
@@ -109,7 +110,22 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 	
 	if (iter == keyframes.end()) {
 		keyframes.push_back(keyframe);
+std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
+	int before = 0, after = keyframes.size();
+	int i;
+	
+	if (currentTime == time || after == 0) return std::pair<KeyframeIterator, KeyframeIterator>(prevKF, nextKF);
+	
+	while (after - before > 1) {
+		i = before + (after-before) / 2;
+		if (keyframes[i]->time > time) after = i+1;
+		else if (i+1 >= after) break;
+		else if (keyframes[i+1]->time <= time) before = i;
+		else if (keyframes[i]->time <= time) break;
 	}
+	
+	return std::pair<KeyframeIterator, KeyframeIterator>(keyframes.begin()+before, keyframes.begin()+after);
+
 }
 
 void KeyframeSet::seek(long newTime) {

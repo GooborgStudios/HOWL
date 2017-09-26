@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <utility>
 
 #define PLAYBACK_DEBUG 0
 
@@ -88,6 +89,7 @@ namespace HOWL {
 			KeyframeSet(Layer *parent);
 		
 			void AddKeyframe(Keyframe *f);
+			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
 			void seek(long newTime);
 			void advanceFrame(long increment);
 			double smoother_fraction();
