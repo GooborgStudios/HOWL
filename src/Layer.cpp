@@ -84,11 +84,6 @@ std::string StringKeyframe::serialize() {
 	return *value;
 }
 
-/*Playhead::Playhead(long startTime) {
-	currentTime = startTime;
-	seek(currentTime);
-}*/
-
 KeyframeSet::KeyframeSet(Layer *parent) {
 	this->parent = parent;
 	this->currentTime = -1;
@@ -151,6 +146,14 @@ void KeyframeSet::seek(long newTime) {
 	}
 	advanceFrame(newTime);
 }
+
+/*void KeyframeSet::seek(long newTime) {
+	std::pair<KeyframeIterator,KeyframeIterator> iters = getSurroundingKeyframes(newTime);
+
+	prevKF = iters.first;
+	nextKF = iters.second;
+	currentTime = newTime;
+}*/
 
 void KeyframeSet::advanceFrame(long increment) {
 	currentTime += increment;

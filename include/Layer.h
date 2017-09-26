@@ -63,19 +63,6 @@ namespace HOWL {
 			StringKeyframe(std::string name, long time, const char *value);
 			std::string serialize();
 	};
-	
-	/*class Playhead {
-		protected:
-			KeyframeIterator prevKF;
-			KeyframeIterator nextKF;
-			long currentTime;
-
-		public:
-			Playhead(long startTime = 0);
-		
-			void seek(long newTime);
-			void advanceFrame(long increment);
-	}*/
 
 	class KeyframeSet {
 		protected:
