@@ -91,25 +91,57 @@ std::string StringKeyframe::serialize() {
 
 KeyframeSet::KeyframeSet(Layer *parent) {
 	this->parent = parent;
+	this->currentTime = -1;
+	this->prevKF = keyframes.end();
+	this->nextKF = keyframes.end();
 }
 
 void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
-	KeyframeIterator iter = keyframes.begin();
-	
-	for (; iter != keyframes.end(); ++iter) {
-		if (keyframe->time == (*iter)->time) {
-			keyframes.erase(iter);
-			keyframes.insert(iter, keyframe);
-			break;
-		}
-		if (keyframe->time < (*iter)->time) {
-			keyframes.insert(iter, keyframe);
-			break;
+	auto iters = getSurroundingKeyframes(keyframe->time);
+
+	if (iters.second == keyframes.end()) {
+		keyframes.push_back(keyframe);
+	} else {
+		if (keyframe->time == (*iters.first)->time) {
+//			keyframes.erase(iters.first);
+			Keyframe *oldKF = *iters.first;
+			*iters.first = keyframe;
+			delete oldKF;
+		} else {
+			int kftime = (*nextKF)->time;
+			int oldcapacity = keyframes.capacity();
+			keyframes.insert(iters.first, keyframe);
+			if (kftime >= keyframe->time || oldcapacity != keyframes.capacity()) seek(keyframe->time);
 		}
 	}
 	
-	if (iter == keyframes.end()) {
-		keyframes.push_back(keyframe);
+	seek(keyframe->time);
+	
+	if (prevKF == keyframes.end() || (keyframe->time < currentTime && currentTime - keyframe->time < currentTime - (*prevKF)->time)) {
+		prevKF = iters.first;
+	} else if (nextKF == keyframes.end() || (keyframe->time > currentTime && keyframe->time - currentTime < (*nextKF)->time - currentTime)) {
+		nextKF = iters.first;
+	}
+	
+//	auto iter = keyframes.begin();
+//
+//	for (; iter != keyframes.end(); ++iter) {
+//		if (keyframe->time == (*iter)->time) {
+//			keyframes.erase(iter);
+//			keyframes.insert(iter, keyframe);
+//			break;
+//		}
+//		if (keyframe->time < (*iter)->time) {
+//			keyframes.insert(iter, keyframe);
+//			break;
+//		}
+//	}
+//
+//	if (iter == keyframes.end()) {
+//		keyframes.push_back(keyframe);
+//	}
+}
+
 std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
 	int before = 0, after = keyframes.size();
 	int i;
