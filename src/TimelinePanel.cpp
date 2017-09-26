@@ -22,6 +22,7 @@ using namespace HOWL;
 
 wxDEFINE_EVENT(HOWL::DISPLAY_REFRESH, wxCommandEvent);
 wxDEFINE_EVENT(HOWL::PLAYHEAD_MOVED, wxCommandEvent);
+wxDEFINE_EVENT(HOWL::SELECTION_CHANGED, wxCommandEvent);
 
 TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project, wxWindowID eventTarget): wxHVScrolledWindow(parent, window_id, wxPoint(-1, -1), wxSize(-1, 250), wxBORDER_SUNKEN) {
 	m_parent = parent;
@@ -76,25 +77,41 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 	if (mousepos.y < headersize) {
 		headerclicked = true;
 		movePlayhead(btn.x * ticksPerCol);
-	} else {
-		active_button = btn;
+		paintNow();
+		return;
 	}
 	
-	/*if (!event.ControlDown()) {
-		for (int i = 0; i < 100; i++) selected_buttons[i] = false;
+	if (!event.ControlDown()) {
+		selected_cells.clear();
 	}
 	
 	if (event.ShiftDown()) {
-		wxRealPoint first_btn = buttonAtCoords(clickpos);
-		for (int x = ceil(std::min(btn.x, first_btn.x)); x <= floor(std::max(btn.x, first_btn.x)); x++) {
-			for (int y = ceil(std::min(btn.y, first_btn.y)); y <= floor(std::max(btn.y, first_btn.y)); y++) {
-				selected_buttons[x + (y * 10)] = true;
+		for (int x = ceil(std::min(btn.x, active_button.x)); x <= floor(std::max(btn.x, active_button.x)); x++) {
+			for (int y = ceil(std::min(btn.y, active_button.y)); y <= floor(std::max(btn.y, active_button.y)); y++) {
+				selected_cells.push_back(wxPoint(x, y));
 			}
 		}
 	} else {
-		if (btn.x == floor(btn.x) && btn.y == floor(btn.y)) selected_buttons[(int)(btn.x + (btn.y * 10))] = !selected_buttons[(int)(btn.x + (btn.y * 10))] ;
-		clickpos = mousepos;
-	}*/
+		if (btn.x == floor(btn.x) && btn.y == floor(btn.y)) {
+			bool found = false;
+			auto iter = selected_cells.begin();
+			while (iter != selected_cells.end() && found == false) {
+				if ((*iter) == btn) found = true;
+				iter++;
+			}
+			if (found) selected_cells.erase(iter);
+			else selected_cells.push_back(btn);
+		}
+	}
+	
+	active_button = btn;
+	
+	if (eventTarget) {
+		wxCommandEvent fin_evt(SELECTION_CHANGED, eventTarget);
+		fin_evt.SetEventObject(this);
+//		fin_evt.SetInt(playhead / ticksPerCol);
+		wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
+	}
 	
 	paintNow();
 }
@@ -142,8 +159,16 @@ void TimelinePanel::render(wxDC &canvas) {
 	render_header(canvas);
 	render_playhead(canvas);
 	
-	canvas.SetPen(wxPen(*wxWHITE, 2));
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+	
+	canvas.SetPen(wxPen(*wxWHITE, 2));
+	for (auto button : selected_cells) {
+		int left = button.x * colsize + xpos;
+		int top = button.y * rowsize + ypos;
+		if (left >= labelsize && top >= headersize) canvas.DrawRectangle(left, top, colsize, rowsize);
+	}
+	
+	canvas.SetPen(wxPen(*wxWHITE, 3));
 	int left = active_button.x * colsize + xpos;
 	int top = active_button.y * rowsize + ypos;
 	if (left >= labelsize && top >= headersize) canvas.DrawRectangle(left, top, colsize, rowsize);
@@ -282,6 +307,29 @@ void TimelinePanel::zoom(int percent) {
 		else colsize = 40;
 	}
 	Refresh();
+}
+
+std::vector<wxPoint> TimelinePanel::getCurrentSelection() {
+	std::vector<wxPoint> current_selection;
+	for (auto cell : selected_cells) {
+		if (cell.x == playhead/ticksPerCol) current_selection.push_back(cell);
+	}
+	
+	return current_selection;
+}
+
+void TimelinePanel::setCurrentSelection(std::vector<wxPoint> selection) {
+	auto iter = selected_cells.begin();
+	while (iter != selected_cells.end()) {
+		if ((*iter).x == playhead/ticksPerCol) iter = selected_cells.erase(iter);
+		else iter++;
+	}
+	
+	for (auto iter : selection) {
+		wxPoint btn = iter;
+		btn.x = playhead/ticksPerCol;
+		selected_cells.push_back(btn);
+	}
 }
 
 wxCoord TimelinePanel::OnGetRowHeight(size_t row) const {
