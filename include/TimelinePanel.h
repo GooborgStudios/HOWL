@@ -22,10 +22,10 @@ namespace HOWL {
 	// Timeline panel
 	class TimelinePanel: public wxHVScrolledWindow {
 		public:
-			TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project, wxWindowID playheadMovedTarget);
+			TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project, wxWindowID eventTarget);
 			~TimelinePanel();
 			void setProject(Project *project);
-			void setPlayheadMovedTarget(wxWindowID playheadMovedTarget);
+			void setEventTarget(wxWindowID eventTarget);
 			void paintEvent(wxPaintEvent &event);
 			void paintNow();
 			void onLeftDown(wxMouseEvent &event);
@@ -60,7 +60,7 @@ namespace HOWL {
 			int ticksPerCol;
 			bool headerclicked = false;
 			Project *activeProject = NULL;
-			wxWindowID playheadMovedTarget = NULL;
+			wxWindowID eventTarget = NULL;
 		
 			double colsPerBeat();
 			int measureFromCol(int col);

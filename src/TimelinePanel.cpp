@@ -23,7 +23,7 @@ using namespace HOWL;
 wxDEFINE_EVENT(HOWL::DISPLAY_REFRESH, wxCommandEvent);
 wxDEFINE_EVENT(HOWL::PLAYHEAD_MOVED, wxCommandEvent);
 
-TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project, wxWindowID playheadMovedTarget): wxHVScrolledWindow(parent, window_id, wxPoint(-1, -1), wxSize(-1, 250), wxBORDER_SUNKEN) {
+TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project, wxWindowID eventTarget): wxHVScrolledWindow(parent, window_id, wxPoint(-1, -1), wxSize(-1, 250), wxBORDER_SUNKEN) {
 	m_parent = parent;
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	
@@ -33,7 +33,7 @@ TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *pro
 	labelsize = 40;
 	active_button = wxPoint(0, 0);
 
-	setPlayheadMovedTarget(playheadMovedTarget);
+	setEventTarget(eventTarget);
 	setProject(project);
 }
 
@@ -54,8 +54,8 @@ void TimelinePanel::setProject(Project *project) {
 	movePlayhead(0);
 }
 
-void TimelinePanel::setPlayheadMovedTarget(wxWindowID playheadMovedTarget) {
-	this->playheadMovedTarget = playheadMovedTarget;
+void TimelinePanel::setEventTarget(wxWindowID eventTarget) {
+	this->eventTarget = eventTarget;
 }
 
 void TimelinePanel::paintEvent(wxPaintEvent &WXUNUSED(event)) {
@@ -259,10 +259,10 @@ void TimelinePanel::movePlayhead(int time) {
 		ScrollToColumn(phCol == 0 ? 0 : phCol - 1);
 	}
 	
-	if (playheadMovedTarget) {
-		wxCommandEvent fin_evt(PLAYHEAD_MOVED, playheadMovedTarget);
+	if (eventTarget) {
+		wxCommandEvent fin_evt(PLAYHEAD_MOVED, eventTarget);
 		fin_evt.SetEventObject(this);
-		wxPostEvent(wxWindow::FindWindowById(playheadMovedTarget), fin_evt);
+		wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
 	}
 
 	Refresh();
