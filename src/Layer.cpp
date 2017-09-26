@@ -103,7 +103,6 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 		keyframes.push_back(keyframe);
 	} else {
 		if (keyframe->time == (*iters.first)->time) {
-//			keyframes.erase(iters.first);
 			Keyframe *oldKF = *iters.first;
 			*iters.first = keyframe;
 			delete oldKF;
@@ -122,24 +121,6 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 	} else if (nextKF == keyframes.end() || (keyframe->time > currentTime && keyframe->time - currentTime < (*nextKF)->time - currentTime)) {
 		nextKF = iters.first;
 	}
-	
-//	auto iter = keyframes.begin();
-//
-//	for (; iter != keyframes.end(); ++iter) {
-//		if (keyframe->time == (*iter)->time) {
-//			keyframes.erase(iter);
-//			keyframes.insert(iter, keyframe);
-//			break;
-//		}
-//		if (keyframe->time < (*iter)->time) {
-//			keyframes.insert(iter, keyframe);
-//			break;
-//		}
-//	}
-//
-//	if (iter == keyframes.end()) {
-//		keyframes.push_back(keyframe);
-//	}
 }
 
 std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
