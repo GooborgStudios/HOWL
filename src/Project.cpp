@@ -24,7 +24,19 @@ void Project::seek(long newTime) {
 	for (auto layer : layers) layer->seek(newTime);
 }
 
-void Project::advanceFrame(long increment) {
+bool Project::advanceFrame(long increment) {
+	bool eof = true;
 	currentTime += increment;
-	for (auto layer : layers) layer->advanceFrame(increment);
+	for (auto layer : layers) {
+		if (layer->advanceFrame(increment) == false) eof = false;
+	}
+	return eof;
+}
+
+bool Project::eof() {
+	bool eof = true;
+	for (auto layer : layers) {
+		if (layer->eof() == false) eof = false;
+	}
+	return eof;
 }

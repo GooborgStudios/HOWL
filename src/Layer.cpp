@@ -136,6 +136,9 @@ std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyfram
 
 }
 
+#define USE_STUPID_SEEK
+
+#ifdef USE_STUPID_SEEK
 void KeyframeSet::seek(long newTime) {
 	currentTime = 0;
 	prevKF = keyframes.begin();
@@ -146,21 +149,28 @@ void KeyframeSet::seek(long newTime) {
 	}
 	advanceFrame(newTime);
 }
-
-/*void KeyframeSet::seek(long newTime) {
+#else
+void KeyframeSet::seek(long newTime) {
 	std::pair<KeyframeIterator,KeyframeIterator> iters = getSurroundingKeyframes(newTime);
 
 	prevKF = iters.first;
 	nextKF = iters.second;
 	currentTime = newTime;
-}*/
+}
+#endif
 
-void KeyframeSet::advanceFrame(long increment) {
+bool KeyframeSet::advanceFrame(long increment) {
 	currentTime += increment;
 	while (nextKF != keyframes.end() && currentTime >= (*nextKF)->time) {
 		++prevKF;
 		++nextKF;
 	}
+	return eof();
+}
+
+bool KeyframeSet::eof() {
+	if (nextKF == keyframes.end()) return true;
+	return false;
 }
 
 double KeyframeSet::smoother_fraction() {
@@ -203,8 +213,20 @@ void Layer::seek(long newTime) {
 	for (auto iter : keyframes) iter.second->seek(newTime);
 }
 
-void Layer::advanceFrame(long increment) {
-	for (auto iter : keyframes) iter.second->advanceFrame(increment);
+bool Layer::advanceFrame(long increment) {
+	bool eof = true;
+	for (auto iter : keyframes) {
+		if (iter.second->advanceFrame(increment) == false) eof = false;
+	}
+	return eof;
+}
+
+bool Layer::eof() {
+	bool eof = true;
+	for (auto iter : keyframes) {
+		if (iter.second->eof() == false) eof = false;
+	}
+	return eof;
 }
 
 double Layer::getDouble(std::string type) {

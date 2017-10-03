@@ -33,6 +33,7 @@ namespace HOWL {
 			virtual int save()=0;
 			virtual int save(std::string filePath)=0;
 			void seek(long newTime);
-			void advanceFrame(long increment);
+			bool advanceFrame(long increment);
+			bool eof();
 	};
 }

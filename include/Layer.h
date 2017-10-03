@@ -78,7 +78,8 @@ namespace HOWL {
 			void AddKeyframe(Keyframe *f);
 			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
 			void seek(long newTime);
-			void advanceFrame(long increment);
+			bool advanceFrame(long increment);
+			bool eof();
 			double smoother_fraction();
 		
 			Keyframe *getFirst();
@@ -95,7 +96,8 @@ namespace HOWL {
 			std::string type;
 			void AddKeyframe(Keyframe *f);
 			void seek(long newTime);
-			void advanceFrame(long increment);
+			bool advanceFrame(long increment);
+			bool eof();
 		
 			double getDouble(std::string type);
 			std::string *getString(std::string type);
