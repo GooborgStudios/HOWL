@@ -277,7 +277,12 @@ void TimelinePanel::advanceCol(int cols) {
 void TimelinePanel::movePlayhead(int time) {
 	if (time < 0) time = 0;
 	int phCol = time / ticksPerCol;
-	activeProject->seek(time);
+	int advance = time - playhead;
+	if ( advance < ticksPerCol*2 && advance > 0 ) {
+		activeProject->advanceFrame(advance);
+	} else {
+		activeProject->seek(time);
+	}
 	playhead = time;
 	
 	if (phCol >= GetVisibleEnd().GetCol() || phCol < GetVisibleBegin().GetCol()) {
