@@ -41,6 +41,7 @@ namespace HOWL {
 			void advanceCol(int cols);
 			void movePlayhead(int time);
 			void zoom(int percent);
+			int getPlayhead();
 			// void RefreshDisplay();
 			// void ChangeNoteColor(wxCommandEvent &event);
 			std::vector<wxPoint> getCurrentSelection();

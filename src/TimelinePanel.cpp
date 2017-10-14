@@ -278,7 +278,7 @@ void TimelinePanel::movePlayhead(int time) {
 	if (time < 0) time = 0;
 	int phCol = time / ticksPerCol;
 	int advance = time - playhead;
-	if ( advance < ticksPerCol*2 && advance > 0 ) {
+	if (advance < ticksPerCol*2 && advance > 0) {
 		activeProject->advanceFrame(advance);
 	} else {
 		activeProject->seek(time);
@@ -312,6 +312,10 @@ void TimelinePanel::zoom(int percent) {
 		else colsize = 40;
 	}
 	Refresh();
+}
+
+int TimelinePanel::getPlayhead() {
+	return playhead;
 }
 
 std::vector<wxPoint> TimelinePanel::getCurrentSelection() {
