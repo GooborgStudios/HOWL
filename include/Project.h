@@ -5,6 +5,11 @@
 // https://www.nightwave.co
 //
 
+/**
+ * @file   Project.h
+ * @brief  This file holds the abstract Project class that holds all of the project's data.
+ */
+
 #pragma once
 
 #include <wx/wxprec.h>
@@ -18,6 +23,9 @@
 #include "Layer.h"
 
 namespace HOWL {
+	/**
+	 * @brief   The abstract Project class that holds all project data.
+	 */
 	class Project {
 		protected:
 			std::string filePath = "";
@@ -29,11 +37,27 @@ namespace HOWL {
 			long currentTime = 0;
 		
 			std::vector<Layer *> layers;
-		
-			virtual int save()=0;
+			
+			/**
+			 * @brief   Saves all project data to the specified file path.
+			 */ 
 			virtual int save(std::string filePath)=0;
-			void seek(long newTime);
-			bool advanceFrame(long increment);
+			
+			/// \overload virtual int save(std::string filePath)=0 
+			virtual int save()=0;
+			
+			
+			void seek(long newTime); ///< Seeks to the specified tick in the animation.
+			
+
+			bool advanceFrame(long increment); ///< Advances the time by the specified increment of ticks in the animation.
+			
+			/**
+			 * @brief   Check if we're at the end of the animation.
+			 *
+			 * @retval TRUE   We're at the end of the animation.
+			 * @retval FALSE  We are not at the end of the animation yet.
+			 */ 
 			bool eof();
 	};
 }
