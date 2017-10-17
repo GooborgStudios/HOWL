@@ -19,6 +19,18 @@
 
 using namespace HOWL;
 
+Selection::Selection() {
+	keyframe = NULL;
+	start = 0;
+	end = 0;
+}
+
+Selection::Selection(Keyframe *kf, long start, long end) {
+	keyframe = kf;
+	this->start = start;
+	this->end = end;
+}
+
 void Project::seek(long newTime) {
 	currentTime = newTime;
 	for (auto layer : layers) layer->seek(newTime);
@@ -39,4 +51,20 @@ bool Project::eof() {
 		if (layer->eof() == false) eof = false;
 	}
 	return eof;
+}
+
+void Project::clearSelection() {
+	if (selection) {
+		delete selection;
+	}
+	selection = NULL;
+}
+
+void Project::addSelection(Keyframe *kf, long start, long end) {
+	// XXX multiple selection will clobber and leak
+	selection = new Selection(kf, start, end);
+}
+
+Selection *Project::getSelection() {
+	return selection;
 }

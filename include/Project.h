@@ -18,7 +18,21 @@
 #include "Layer.h"
 
 namespace HOWL {
+
+	class Selection {
+		public:
+			Keyframe *keyframe;
+			long start;
+			long end;
+		
+			Selection();
+			Selection(Keyframe *kf, long start, long end);
+	};
+	
 	class Project {
+		private:
+			Selection *selection = NULL;
+		
 		protected:
 			std::string filePath = "";
 		
@@ -35,5 +49,11 @@ namespace HOWL {
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
+		
+			void clearSelection();
+			void addSelection(Keyframe *kf, long start, long end);
+			//void toggleSelection(Keyfreme *kf, long start, long end);
+			Selection *getSelection();
 	};
+
 }
