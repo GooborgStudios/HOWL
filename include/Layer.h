@@ -88,8 +88,6 @@ namespace HOWL {
 	};
 
 	class Layer {
-	private:
-			KeyframeSet *findSet(std::string);
 		public:
 			Layer();
 			Layer(std::string d);
@@ -97,6 +95,7 @@ namespace HOWL {
 			std::vector<KeyframeSet *> keyframes;
 			std::string description;
 			std::string type;
+			KeyframeSet *findSet(std::string);
 			void AddKeyframe(Keyframe *f);
 			void seek(long newTime);
 			bool advanceFrame(long increment);

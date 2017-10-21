@@ -213,7 +213,7 @@ KeyframeSet *Layer::findSet(std::string name) {
 
 void Layer::AddKeyframe(Keyframe *keyframe) {
 	KeyframeSet *found = findSet(keyframe->name);
-	if ( ! found ) {
+	if (!found) {
 		found = new KeyframeSet(keyframe->name, this);
 		keyframes.push_back(found);
 	}
