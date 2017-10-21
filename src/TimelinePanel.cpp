@@ -51,7 +51,7 @@ void TimelinePanel::setProject(Project *project) {
 	for (auto l: activeProject->layers) {
 		if (true /* l->isExpanded */) {
 			for (auto k: l->keyframes) {
-				visible_layers[k.first] = k.second;
+				visible_layers[rows] = k;
 				rows++;
 			}
 		}
@@ -118,7 +118,7 @@ void TimelinePanel::render(wxDC &canvas) {
 	int ypos = headersize-(GetVisibleBegin().GetRow()*rowsize);
 	int cypos = ypos;
 	for (auto kf: visible_layers) {
-		if (cypos >= headersize-rowsize) render_row(canvas, kf.first, kf.second, wxRect(0, cypos, width, rowsize));
+		if (cypos >= headersize-rowsize) render_row(canvas, kf.second->name, kf.second, wxRect(0, cypos, width, rowsize));
 		cypos += rowsize;
 		if (cypos >= canvas.GetSize().GetY()) break;
 	}

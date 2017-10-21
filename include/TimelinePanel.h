@@ -58,7 +58,7 @@ namespace HOWL {
 			int colsize;
 			int headersize;
 			int labelsize;
-			std::map<std::string, KeyframeSet *> visible_layers;
+			std::map<int, KeyframeSet *> visible_layers;
 			bool headerclicked = false;
 			Project *activeProject = NULL;
 			wxWindowID eventTarget = NULL;

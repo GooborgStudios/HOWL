@@ -70,10 +70,11 @@ namespace HOWL {
 			KeyframeIterator nextKF;
 			Layer *parent;
 		public:
+			std::string name;
 			std::vector<Keyframe *> keyframes;
 			long currentTime;
 		
-			KeyframeSet(Layer *parent);
+			KeyframeSet(std::string name, Layer *parent);
 		
 			void AddKeyframe(Keyframe *f);
 			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
@@ -87,11 +88,13 @@ namespace HOWL {
 	};
 
 	class Layer {
+	private:
+			KeyframeSet *findSet(std::string);
 		public:
 			Layer();
 			Layer(std::string d);
 
-			std::map<std::string, KeyframeSet *> keyframes;
+			std::vector<KeyframeSet *> keyframes;
 			std::string description;
 			std::string type;
 			void AddKeyframe(Keyframe *f);
