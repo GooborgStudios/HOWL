@@ -48,7 +48,7 @@ void Keyframe::toBuffer(char *outbuf, int len) {
 	snprintf(outbuf, len, "");
 }
 
-void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
+void Keyframe::render(wxDC &canvas, wxRect bounding_box, bool selected) {
 	
 }
 

@@ -20,15 +20,30 @@
 using namespace HOWL;
 
 Selection::Selection() {
+	clear();
+}
+
+void Selection::clear() {
 	keyframe = NULL;
 	start = 0;
 	end = 0;
 }
 
-Selection::Selection(Keyframe *kf, long start, long end) {
+void Selection::add(Keyframe *kf, long start, long end) {
 	keyframe = kf;
 	this->start = start;
 	this->end = end;
+}
+
+void Selection::toggle(Keyframe *kf, long start, long end) {
+	// XXX Implement me!
+}
+
+bool Selection::matches(Keyframe *other_kf) {
+    if (keyframe == NULL || !keyframe) return false;
+    return (keyframe->name == other_kf->name
+        && start <= other_kf->time
+        && end > other_kf->time);
 }
 
 void Project::seek(long newTime) {
@@ -51,20 +66,4 @@ bool Project::eof() {
 		if (layer->eof() == false) eof = false;
 	}
 	return eof;
-}
-
-void Project::clearSelection() {
-	if (selection) {
-		delete selection;
-	}
-	selection = NULL;
-}
-
-void Project::addSelection(Keyframe *kf, long start, long end) {
-	// XXX multiple selection will clobber and leak
-	selection = new Selection(kf, start, end);
-}
-
-Selection *Project::getSelection() {
-	return selection;
 }

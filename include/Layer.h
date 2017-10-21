@@ -42,7 +42,7 @@ namespace HOWL {
 			virtual std::string serialize();
 			void toBuffer(char *outbuf, int len);
 		
-			virtual void render(wxDC &canvas, wxRect bounding_box);
+			virtual void render(wxDC &canvas, wxRect bounding_box, bool selected = false);
 	};
 
 	typedef std::vector<Keyframe *>::iterator KeyframeIterator;

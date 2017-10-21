@@ -88,7 +88,7 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 		return;
 	}
 	
-	activeProject->addSelection(NULL, btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
+	activeProject->selection.add(NULL, btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 
 	if (eventTarget) {
 		wxCommandEvent fin_evt(SELECTION_CHANGED, eventTarget);
@@ -128,12 +128,6 @@ void TimelinePanel::render(wxDC &canvas) {
 	
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	
-//	canvas.SetPen(wxPen(*wxWHITE, 2));
-//	for (auto button : selected_cells) {
-//		int left = button.x * colsize + xpos;
-//		int top = button.y * rowsize + ypos;
-//		if (left >= labelsize && top >= headersize) canvas.DrawRectangle(left, top, colsize, rowsize);
-//	}
 }
 
 void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box) {
@@ -141,6 +135,8 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 	int colNtime = GetVisibleEnd().GetCol() * ticksPerCol;
 	int lastCol = 0;
 	
+    Selection sel = activeProject->selection;
+
 	canvas.SetPen(*wxBLACK_PEN);
 	canvas.DrawLine(bounding_box.GetLeft(), bounding_box.GetHeight(), bounding_box.GetRight(), bounding_box.GetHeight());
 	
@@ -159,7 +155,7 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 
 		wxRect kfbox(bounding_box);
 		kfbox.SetLeft(left);
-		iter->render(canvas, kfbox);
+		iter->render(canvas, kfbox, sel.matches(iter));
 	}
 	
 	if (lastCol > GetColumnCount()) SetColumnCount(lastCol);
