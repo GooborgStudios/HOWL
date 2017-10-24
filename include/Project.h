@@ -18,7 +18,22 @@
 #include "Layer.h"
 
 namespace HOWL {
+
+	class Selection {
+		public:
+			KeyframeSet *set;
+			long start;
+			long end;
+		
+			Selection();
+			void clear();
+			void add(KeyframeSet *set, long start, long end);
+			void toggle(KeyframeSet *set, long start, long end);
+            bool matches(Keyframe *kf);
+	};
+	
 	class Project {
+		
 		protected:
 			std::string filePath = "";
 		
@@ -29,6 +44,7 @@ namespace HOWL {
 			long currentTime = 0;
 		
 			std::vector<Layer *> layers;
+			Selection selection;
 		
 			virtual int save()=0;
 			virtual int save(std::string filePath)=0;
@@ -36,4 +52,5 @@ namespace HOWL {
 			bool advanceFrame(long increment);
 			bool eof();
 	};
+
 }

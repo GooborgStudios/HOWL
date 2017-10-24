@@ -19,6 +19,33 @@
 
 using namespace HOWL;
 
+Selection::Selection() {
+	clear();
+}
+
+void Selection::clear() {
+	set = NULL;
+	start = 0;
+	end = 0;
+}
+
+void Selection::add(KeyframeSet *set, long start, long end) {
+	this->set = set;
+	this->start = start;
+	this->end = end;
+}
+
+void Selection::toggle(KeyframeSet *set, long start, long end) {
+	// XXX Implement me!
+}
+
+bool Selection::matches(Keyframe *kf) {
+    if (set == NULL || !set) return false;
+    return (set->name == kf->name
+        && start <= kf->time
+        && end > kf->time);
+}
+
 void Project::seek(long newTime) {
 	currentTime = newTime;
 	for (auto layer : layers) layer->seek(newTime);

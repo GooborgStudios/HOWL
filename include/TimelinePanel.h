@@ -44,16 +44,12 @@ namespace HOWL {
 			int getPlayhead();
 			// void RefreshDisplay();
 			// void ChangeNoteColor(wxCommandEvent &event);
-			std::vector<wxPoint> getCurrentSelection();
-			void setCurrentSelection(std::vector<wxPoint> selection);
 		
 		protected:
 			wxCoord OnGetRowHeight(size_t row) const;
 			wxCoord OnGetColumnWidth(size_t column) const;
 			int playhead;
 			int ticksPerCol;
-			wxPoint active_button;
-			std::vector<wxPoint> selected_cells;
 		
 		private:
 			wxPanel *m_parent;
@@ -62,6 +58,7 @@ namespace HOWL {
 			int colsize;
 			int headersize;
 			int labelsize;
+			std::map<int, KeyframeSet *> visible_layers;
 			bool headerclicked = false;
 			Project *activeProject = NULL;
 			wxWindowID eventTarget = NULL;
