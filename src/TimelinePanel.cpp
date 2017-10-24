@@ -320,6 +320,13 @@ wxPoint TimelinePanel::mousepos_to_buttons(wxPoint mousepos) {
 	);
 }
 
+wxPoint TimelinePanel::index_to_screenpos(wxPoint index) {
+	return wxPoint(
+	   (index.x * colsize) - offset_in_pixels().x + labelsize,
+	   (index.y * rowsize) - offset_in_pixels().y + headersize
+	);
+}
+
 wxBEGIN_EVENT_TABLE(TimelinePanel, wxPanel)
 	EVT_PAINT(TimelinePanel::paintEvent)
 	EVT_LEFT_DOWN(TimelinePanel::onLeftDown)

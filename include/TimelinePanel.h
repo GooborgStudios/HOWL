@@ -71,6 +71,7 @@ namespace HOWL {
 			int playhead_in_pixels();
 			wxPoint offset_in_pixels();
 			wxPoint mousepos_to_buttons(wxPoint mousepos);
+			wxPoint index_to_screenpos(wxPoint index);
 		
 			wxDECLARE_EVENT_TABLE();
 	};
