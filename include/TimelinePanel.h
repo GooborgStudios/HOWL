@@ -46,6 +46,7 @@ namespace HOWL {
 			wxCoord OnGetColumnWidth(size_t column) const;
 			void render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box);
 			void render_header_segment(wxDC &canvas, int col, int xpos);
+			void render_selection(wxDC &canvas, Selection sel);
 			void render_header(wxDC &canvas);
 			void render_playhead(wxDC &canvas);
 			int playhead;

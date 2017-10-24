@@ -122,12 +122,27 @@ void TimelinePanel::render(wxDC &canvas) {
 		cypos += rowsize;
 		if (cypos >= canvas.GetSize().GetY()) break;
 	}
-	
+	render_selection(canvas, activeProject->selection);
 	render_header(canvas);
 	render_playhead(canvas);
 	
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	
+}
+
+void TimelinePanel::render_selection(wxDC &canvas, Selection sel) {
+	if (sel.set == NULL) return;
+	
+	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+	canvas.SetPen(wxPen(*wxWHITE, 2));
+	
+	int i=0;
+	for (; i<visible_layers.size(); i++) {
+		if (visible_layers[i]->name == sel.set->name) break;
+	}
+	
+	wxRect bounding_box = wxRect(index_to_screenpos(wxPoint(sel.start/ticksPerCol, i)), index_to_screenpos(wxPoint(sel.end/ticksPerCol, i+1)));
+	canvas.DrawRectangle(bounding_box);
 }
 
 void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box) {
