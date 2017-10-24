@@ -88,7 +88,7 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 		return;
 	}
 	
-	activeProject->selection.add(NULL, btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
+	activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 
 	if (eventTarget) {
 		wxCommandEvent fin_evt(SELECTION_CHANGED, eventTarget);
@@ -155,7 +155,7 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 
 		wxRect kfbox(bounding_box);
 		kfbox.SetLeft(left);
-		iter->render(canvas, kfbox, sel.matches(iter));
+		iter->render(canvas, kfbox);
 	}
 	
 	if (lastCol > GetColumnCount()) SetColumnCount(lastCol);

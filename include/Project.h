@@ -21,14 +21,14 @@ namespace HOWL {
 
 	class Selection {
 		public:
-			Keyframe *keyframe;
+			KeyframeSet *set;
 			long start;
 			long end;
 		
 			Selection();
 			void clear();
-			void add(Keyframe *kf, long start, long end);
-			void toggle(Keyframe *kf, long start, long end);
+			void add(KeyframeSet *set, long start, long end);
+			void toggle(KeyframeSet *set, long start, long end);
             bool matches(Keyframe *kf);
 	};
 	
