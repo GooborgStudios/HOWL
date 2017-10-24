@@ -24,26 +24,26 @@ Selection::Selection() {
 }
 
 void Selection::clear() {
-	keyframe = NULL;
+	set = NULL;
 	start = 0;
 	end = 0;
 }
 
-void Selection::add(Keyframe *kf, long start, long end) {
-	keyframe = kf;
+void Selection::add(KeyframeSet *set, long start, long end) {
+	this->set = set;
 	this->start = start;
 	this->end = end;
 }
 
-void Selection::toggle(Keyframe *kf, long start, long end) {
+void Selection::toggle(KeyframeSet *set, long start, long end) {
 	// XXX Implement me!
 }
 
-bool Selection::matches(Keyframe *other_kf) {
-    if (keyframe == NULL || !keyframe) return false;
-    return (keyframe->name == other_kf->name
-        && start <= other_kf->time
-        && end > other_kf->time);
+bool Selection::matches(Keyframe *kf) {
+    if (set == NULL || !set) return false;
+    return (set->name == kf->name
+        && start <= kf->time
+        && end > kf->time);
 }
 
 void Project::seek(long newTime) {
