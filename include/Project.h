@@ -23,10 +23,25 @@
 #include "Layer.h"
 
 namespace HOWL {
+
+	class Selection {
+		public:
+			KeyframeSet *set;
+			long start;
+			long end;
+		
+			Selection();
+			void clear();
+			void add(KeyframeSet *set, long start, long end);
+			void toggle(KeyframeSet *set, long start, long end);
+            bool matches(Keyframe *kf);
+	};
+	
 	/**
 	 * @brief   The abstract Project class that holds all project data.
 	 */
 	class Project {
+		
 		protected:
 			std::string filePath = "";
 		
@@ -37,6 +52,8 @@ namespace HOWL {
 			long currentTime = 0;
 		
 			std::vector<Layer *> layers;
+			Selection selection;
+		
 			
 			/**
 			 * @brief   Saves all project data to the specified file path.
@@ -60,4 +77,5 @@ namespace HOWL {
 			 */ 
 			bool eof();
 	};
+
 }

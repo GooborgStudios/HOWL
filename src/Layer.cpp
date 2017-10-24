@@ -84,7 +84,8 @@ std::string StringKeyframe::serialize() {
 	return *value;
 }
 
-KeyframeSet::KeyframeSet(Layer *parent) {
+KeyframeSet::KeyframeSet(std::string name, Layer *parent) {
+	this->name = name;
 	this->parent = parent;
 	this->currentTime = -1;
 	this->prevKF = keyframes.end();
@@ -203,20 +204,31 @@ Layer::Layer(std::string description) {
 	this->description = description;
 }
 
+KeyframeSet *Layer::findSet(std::string name) {
+	for (auto kf: keyframes) {
+		if (kf->name == name) return kf;
+	}
+	return NULL;
+}
+
 void Layer::AddKeyframe(Keyframe *keyframe) {
-	std::string type = keyframe->name;
-	if (keyframes.find(type) == keyframes.end()) keyframes[type] = new KeyframeSet(this);
-	keyframes[type]->AddKeyframe(keyframe);
+	KeyframeSet *found = findSet(keyframe->name);
+	if (!found) {
+		found = new KeyframeSet(keyframe->name, this);
+		keyframes.push_back(found);
+	}
+//	if (keyframes.find(type) == keyframes.end()) keyframes[type] = new KeyframeSet(this);
+	found->AddKeyframe(keyframe);
 }
 
 void Layer::seek(long newTime) {
-	for (auto iter : keyframes) iter.second->seek(newTime);
+	for (auto iter : keyframes) iter->seek(newTime);
 }
 
 bool Layer::advanceFrame(long increment) {
 	bool eof = true;
 	for (auto iter : keyframes) {
-		if (iter.second->advanceFrame(increment) == false) eof = false;
+		if (iter->advanceFrame(increment) == false) eof = false;
 	}
 	return eof;
 }
@@ -224,13 +236,15 @@ bool Layer::advanceFrame(long increment) {
 bool Layer::eof() {
 	bool eof = true;
 	for (auto iter : keyframes) {
-		if (iter.second->eof() == false) eof = false;
+		if (iter->eof() == false) eof = false;
 	}
 	return eof;
 }
 
 double Layer::getDouble(std::string type) {
-	KeyframeSet *set = keyframes[type];
+	KeyframeSet *set = findSet(type);
+	if (set == NULL) return 0.0;
+	
 	DoubleKeyframe *KF1 = (DoubleKeyframe *)(set->getFirst());
 	DoubleKeyframe *KF2 = (DoubleKeyframe *)(set->getSecond());
 	
@@ -241,8 +255,9 @@ double Layer::getDouble(std::string type) {
 }
 
 std::string *Layer::getString(std::string type) {
-	if (keyframes[type]->getFirst() == NULL) return new std::string("");
-	return ((StringKeyframe *)(keyframes[type]->getFirst()))->value;
+	KeyframeSet *set = findSet(type);
+	if (set == NULL || set->getFirst() == NULL) return new std::string("");
+	return ((StringKeyframe *)(set->getFirst()))->value;
 }
 
 bool is_sooner(Keyframe *a, Keyframe *b) {
