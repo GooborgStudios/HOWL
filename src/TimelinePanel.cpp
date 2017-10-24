@@ -155,7 +155,7 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 
 		wxRect kfbox(bounding_box);
 		kfbox.SetLeft(left);
-		iter->render(canvas, kfbox, sel.matches(iter));
+		iter->render(canvas, kfbox);
 	}
 	
 	if (lastCol > GetColumnCount()) SetColumnCount(lastCol);
