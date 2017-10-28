@@ -88,6 +88,7 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 		return;
 	}
 	
+	if (!event.ControlDown()) activeProject->selection.clear();
 	activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 
 	if (eventTarget) {
