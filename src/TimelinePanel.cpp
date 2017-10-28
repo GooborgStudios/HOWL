@@ -56,7 +56,7 @@ void TimelinePanel::setProject(Project *project) {
 			}
 		}
 	}
-	SetRowColumnCount(rows, 1);
+	SetRowColumnCount(rows+1, 1);
 	
 	Update();
 	movePlayhead(0);
