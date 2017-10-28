@@ -24,15 +24,15 @@ Selection::Selection() {
 }
 
 void Selection::clear() {
-	set = NULL;
-	start = 0;
-	end = 0;
+	sel->set = NULL;
+	sel->start = 0;
+	sel->end = 0;
 }
 
 void Selection::add(KeyframeSet *set, long start, long end) {
-	this->set = set;
-	this->start = start;
-	this->end = end;
+	sel->set = set;
+	sel->start = start;
+	sel->end = end;
 }
 
 void Selection::toggle(KeyframeSet *set, long start, long end) {
@@ -40,10 +40,10 @@ void Selection::toggle(KeyframeSet *set, long start, long end) {
 }
 
 bool Selection::matches(Keyframe *kf) {
-    if (set == NULL || !set) return false;
-    return (set->name == kf->name
-        && start <= kf->time
-        && end > kf->time);
+    if (sel->set == NULL || !sel->set) return false;
+    return (sel->set->name == kf->name
+        && sel->start <= kf->time
+        && sel->end > kf->time);
 }
 
 void Project::seek(long newTime) {
