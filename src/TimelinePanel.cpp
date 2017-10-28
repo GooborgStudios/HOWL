@@ -131,18 +131,20 @@ void TimelinePanel::render(wxDC &canvas) {
 }
 
 void TimelinePanel::render_selection(wxDC &canvas, Selection sel) {
-	if (sel.set == NULL) return;
-	
-	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
-	canvas.SetPen(wxPen(*wxWHITE, 2));
-	
-	int i=0;
-	for (; i<visible_layers.size(); i++) {
-		if (visible_layers[i]->name == sel.set->name) break;
+	for (SingleSelection *s : sel.sel) {
+		if (s->set == NULL) return;
+		
+		canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+		canvas.SetPen(wxPen(*wxWHITE, 2));
+		
+		int i=0;
+		for (; i<visible_layers.size(); i++) {
+			if (visible_layers[i]->name == s->set->name) break;
+		}
+		
+		wxRect bounding_box = wxRect(index_to_screenpos(wxPoint(s->start/ticksPerCol, i)), index_to_screenpos(wxPoint(s->end/ticksPerCol, i+1)));
+		canvas.DrawRectangle(bounding_box);
 	}
-	
-	wxRect bounding_box = wxRect(index_to_screenpos(wxPoint(sel.start/ticksPerCol, i)), index_to_screenpos(wxPoint(sel.end/ticksPerCol, i+1)));
-	canvas.DrawRectangle(bounding_box);
 }
 
 void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box) {

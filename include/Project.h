@@ -27,7 +27,7 @@ namespace HOWL {
 
 	class Selection {
 		public:
-			SingleSelection *sel;
+			std::vector<SingleSelection *> sel;
 		
 			Selection();
 			void clear();
