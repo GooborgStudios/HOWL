@@ -23,12 +23,16 @@
 #include "Layer.h"
 
 namespace HOWL {
+	
+	struct SingleSelection {
+		KeyframeSet *set;
+		long start;
+		long end;
+	};
 
 	class Selection {
 		public:
-			KeyframeSet *set;
-			long start;
-			long end;
+			std::vector<SingleSelection *> sel;
 		
 			Selection();
 			void clear();
@@ -78,4 +82,6 @@ namespace HOWL {
 			bool eof();
 	};
 
+	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
+	wxDECLARE_EVENT(PROJECT_LOADED, wxCommandEvent);
 }

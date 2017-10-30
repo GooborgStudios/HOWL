@@ -19,20 +19,23 @@
 
 using namespace HOWL;
 
+wxDEFINE_EVENT(HOWL::PROJECT_SAVED, wxCommandEvent);
+wxDEFINE_EVENT(HOWL::PROJECT_LOADED, wxCommandEvent);
+
 Selection::Selection() {
 	clear();
 }
 
 void Selection::clear() {
-	set = NULL;
-	start = 0;
-	end = 0;
+	sel.clear();
 }
 
 void Selection::add(KeyframeSet *set, long start, long end) {
-	this->set = set;
-	this->start = start;
-	this->end = end;
+	SingleSelection *newsel = new SingleSelection;
+	newsel->set = set;
+	newsel->start = start;
+	newsel->end = end;
+	sel.push_back(newsel);
 }
 
 void Selection::toggle(KeyframeSet *set, long start, long end) {
@@ -40,10 +43,14 @@ void Selection::toggle(KeyframeSet *set, long start, long end) {
 }
 
 bool Selection::matches(Keyframe *kf) {
-    if (set == NULL || !set) return false;
-    return (set->name == kf->name
-        && start <= kf->time
-        && end > kf->time);
+	for (SingleSelection *s : sel) {
+		if (s->set == NULL || !s->set) continue;
+		if (s->set->name == kf->name
+			&& s->start <= kf->time
+			&& s->end > kf->time) return true;
+	}
+	
+	return false;
 }
 
 void Project::seek(long newTime) {

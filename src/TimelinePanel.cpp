@@ -56,7 +56,7 @@ void TimelinePanel::setProject(Project *project) {
 			}
 		}
 	}
-	SetRowColumnCount(rows, 1);
+	SetRowColumnCount(rows+1, 1);
 	
 	Update();
 	movePlayhead(0);
@@ -88,6 +88,7 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 		return;
 	}
 	
+	if (!event.ControlDown()) activeProject->selection.clear();
 	activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 
 	if (eventTarget) {
@@ -122,12 +123,29 @@ void TimelinePanel::render(wxDC &canvas) {
 		cypos += rowsize;
 		if (cypos >= canvas.GetSize().GetY()) break;
 	}
-	
+	render_selection(canvas, activeProject->selection);
 	render_header(canvas);
 	render_playhead(canvas);
 	
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	
+}
+
+void TimelinePanel::render_selection(wxDC &canvas, Selection sel) {
+	for (SingleSelection *s : sel.sel) {
+		if (s->set == NULL) return;
+		
+		canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+		canvas.SetPen(wxPen(*wxWHITE, 2));
+		
+		int i=0;
+		for (; i<visible_layers.size(); i++) {
+			if (visible_layers[i]->name == s->set->name) break;
+		}
+		
+		wxRect bounding_box = wxRect(index_to_screenpos(wxPoint(s->start/ticksPerCol, i)), index_to_screenpos(wxPoint(s->end/ticksPerCol, i+1)));
+		canvas.DrawRectangle(bounding_box);
+	}
 }
 
 void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box) {
@@ -317,6 +335,13 @@ wxPoint TimelinePanel::mousepos_to_buttons(wxPoint mousepos) {
 	return wxPoint(
 		(mousepos.x + offset_in_pixels().x - labelsize)  / colsize,
 		(mousepos.y + offset_in_pixels().y - headersize) / rowsize
+	);
+}
+
+wxPoint TimelinePanel::index_to_screenpos(wxPoint index) {
+	return wxPoint(
+	   (index.x * colsize) - offset_in_pixels().x + labelsize,
+	   (index.y * rowsize) - offset_in_pixels().y + headersize
 	);
 }
 
