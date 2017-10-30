@@ -57,4 +57,6 @@ namespace HOWL {
 			bool eof();
 	};
 
+	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
+	wxDECLARE_EVENT(PROJECT_LOADED, wxCommandEvent);
 }
