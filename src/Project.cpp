@@ -19,6 +19,9 @@
 
 using namespace HOWL;
 
+wxDEFINE_EVENT(HOWL::PROJECT_SAVED, wxCommandEvent);
+wxDEFINE_EVENT(HOWL::PROJECT_LOADED, wxCommandEvent);
+
 Selection::Selection() {
 	clear();
 }
