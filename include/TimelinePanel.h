@@ -32,10 +32,6 @@ namespace HOWL {
 			void onMouseMove(wxMouseEvent &event);
 			void onLeftUp(wxMouseEvent &event);
 			void render(wxDC &canvas);
-			void render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box);
-			void render_header_segment(wxDC &canvas, int col, int xpos);
-			void render_header(wxDC &canvas);
-			void render_playhead(wxDC &canvas);
 			void nextBeat();
 			void nextQuarterBeat();
 			void advanceCol(int cols);
@@ -48,6 +44,11 @@ namespace HOWL {
 		protected:
 			wxCoord OnGetRowHeight(size_t row) const;
 			wxCoord OnGetColumnWidth(size_t column) const;
+			void render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box);
+			void render_header_segment(wxDC &canvas, int col, int xpos);
+			void render_selection(wxDC &canvas, Selection sel);
+			void render_header(wxDC &canvas);
+			void render_playhead(wxDC &canvas);
 			int playhead;
 			int ticksPerCol;
 		
@@ -71,6 +72,7 @@ namespace HOWL {
 			int playhead_in_pixels();
 			wxPoint offset_in_pixels();
 			wxPoint mousepos_to_buttons(wxPoint mousepos);
+			wxPoint index_to_screenpos(wxPoint index);
 		
 			wxDECLARE_EVENT_TABLE();
 	};
