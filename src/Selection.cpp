@@ -13,6 +13,9 @@
 
 using namespace HOWL;
 
+wxDEFINE_EVENT(SELECTION_ON, HOWL::SelectionEvent);
+wxDEFINE_EVENT(SELECTION_OFF, HOWL::SelectionEvent);
+
 Selection::Selection() {
 	clear();
 }
@@ -38,6 +41,7 @@ void Selection::toggle(KeyframeSet *set, long start, long end) {
 	// XXX Implement me!
 }
 
+SelectionEvent::SelectionEvent(wxEventType eventType, wxWindowID winid, Selection *selection) : wxEvent(winid, eventType), m_selection(selection) {
 bool Selection::matches(Keyframe *kf) {
 	for (SingleSelection *s : sel) {
 		if (s->set == NULL || !s->set) continue;
@@ -48,3 +52,19 @@ bool Selection::matches(Keyframe *kf) {
 	
 	return false;
 }
+
+	
+};
+
+void SelectionEvent::SetSelection(Selection *selection) {
+	m_selection = new Selection(selection);
+}
+
+Selection *SelectionEvent::GetSelection() const {
+	return m_selection;
+}
+
+wxEvent* SelectionEvent::Clone() const {
+	return new SelectionEvent(*this);
+}
+

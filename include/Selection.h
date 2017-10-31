@@ -30,4 +30,23 @@ namespace HOWL {
 			void toggle(KeyframeSet *set, long start, long end);
 			bool matches(Keyframe *kf);
 	};
+	
+	class SelectionEvent : public wxEvent {
+		public:
+			SelectionEvent(wxEventType eventType, wxWindowID winid, Selection *selection);
+		
+			void SetSelection(Selection *selection);
+			Selection *GetSelection() const;
+			wxEvent* Clone() const;
+		
+		private:
+			Selection *m_selection;
+	};
+	
+	wxDECLARE_EVENT(SELECTION_ON, SelectionEvent);
+	wxDECLARE_EVENT(SELECTION_OFF, SelectionEvent);
 };
+
+#define SelectionEventHandler(func) (&func)
+#define EVT_HOWL_SELECTION_ON(id, func) wx__DECLARE_EVT1(HOWL::SELECTION_ON, id, SelectionEventHandler(func))
+#define EVT_HOWL_SELECTION_OFF(id, func) wx__DECLARE_EVT1(HOWL::SELECTION_OFF, id, SelectionEventHandler(func))
