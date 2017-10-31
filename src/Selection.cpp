@@ -41,7 +41,6 @@ void Selection::toggle(KeyframeSet *set, long start, long end) {
 	// XXX Implement me!
 }
 
-SelectionEvent::SelectionEvent(wxEventType eventType, wxWindowID winid, Selection *selection) : wxEvent(winid, eventType), m_selection(selection) {
 bool Selection::matches(Keyframe *kf) {
 	for (SingleSelection *s : sel) {
 		if (s->set == NULL || !s->set) continue;
@@ -53,14 +52,15 @@ bool Selection::matches(Keyframe *kf) {
 	return false;
 }
 
+SelectionEvent::SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection) : wxEvent(winid, eventType), m_selection(selection) {
 	
 };
 
-void SelectionEvent::SetSelection(Selection *selection) {
-	m_selection = new Selection(selection);
+void SelectionEvent::SetSelection(SingleSelection selection) {
+	m_selection = selection;
 }
 
-Selection *SelectionEvent::GetSelection() const {
+SingleSelection SelectionEvent::GetSelection() const {
 	return m_selection;
 }
 

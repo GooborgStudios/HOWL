@@ -33,14 +33,14 @@ namespace HOWL {
 	
 	class SelectionEvent : public wxEvent {
 		public:
-			SelectionEvent(wxEventType eventType, wxWindowID winid, Selection *selection);
+			SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection);
 		
-			void SetSelection(Selection *selection);
-			Selection *GetSelection() const;
+			void SetSelection(SingleSelection selection);
+			SingleSelection GetSelection() const;
 			wxEvent* Clone() const;
 		
 		private:
-			Selection *m_selection;
+			SingleSelection m_selection;
 	};
 	
 	wxDECLARE_EVENT(SELECTION_ON, SelectionEvent);
