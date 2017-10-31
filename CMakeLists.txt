@@ -36,6 +36,7 @@ add_library(HOWL SHARED
 	${SRC}/Layer.cpp ${INCL}/Layer.h
 	${SRC}/Project.cpp ${INCL}/Project.h
 	${SRC}/TimelinePanel.cpp ${INCL}/TimelinePanel.h
+	${SRC}/Selection.cpp ${INCL}/Selection.h
 )
 
 set(CMAKE_CXX_COMPILER g++)
