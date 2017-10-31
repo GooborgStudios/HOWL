@@ -13,8 +13,8 @@
 
 using namespace HOWL;
 
-wxDEFINE_EVENT(SELECTION_ON, HOWL::SelectionEvent);
-wxDEFINE_EVENT(SELECTION_OFF, HOWL::SelectionEvent);
+wxDEFINE_EVENT(HOWL::SELECTION_ON, HOWL::SelectionEvent);
+wxDEFINE_EVENT(HOWL::SELECTION_OFF, HOWL::SelectionEvent);
 
 Selection::Selection() {
 	clear();
