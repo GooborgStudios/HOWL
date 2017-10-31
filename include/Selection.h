@@ -19,13 +19,15 @@ namespace HOWL {
 	};
 	
 	class Selection {
-	public:
-		std::vector<SingleSelection *> sel;
+		public:
+			std::vector<SingleSelection *> sel;
 		
-		Selection();
-		void clear();
-		void add(KeyframeSet *set, long start, long end);
-		void toggle(KeyframeSet *set, long start, long end);
-		bool matches(Keyframe *kf);
+			Selection();
+			Selection(Selection *other);
+		
+			void clear();
+			void add(KeyframeSet *set, long start, long end);
+			void toggle(KeyframeSet *set, long start, long end);
+			bool matches(Keyframe *kf);
 	};
 };

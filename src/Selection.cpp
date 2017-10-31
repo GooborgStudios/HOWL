@@ -17,6 +17,11 @@ Selection::Selection() {
 	clear();
 }
 
+Selection::Selection(Selection *other) {
+	clear();
+	sel = std::vector<SingleSelection *>(other->sel);
+}
+
 void Selection::clear() {
 	sel.clear();
 }
