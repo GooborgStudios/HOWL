@@ -92,7 +92,7 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 	activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 
 	if (eventTarget) {
-		wxCommandEvent fin_evt(SELECTION_CHANGED, eventTarget);
+		wxCommandEvent fin_evt(SELECTION_ON, eventTarget);
 		fin_evt.SetEventObject(this);
 //		fin_evt.SetInt(playhead / ticksPerCol);
 		wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
