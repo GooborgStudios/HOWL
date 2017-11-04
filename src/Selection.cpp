@@ -16,6 +16,7 @@ using namespace HOWL;
 wxDEFINE_EVENT(HOWL::SELECTION_ON, HOWL::SelectionEvent);
 wxDEFINE_EVENT(HOWL::SELECTION_OFF, HOWL::SelectionEvent);
 
+// XXX Rename me to SelectionSet!
 Selection::Selection() {
 	clear();
 }

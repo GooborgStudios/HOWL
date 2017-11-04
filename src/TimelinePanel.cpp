@@ -17,6 +17,7 @@
 #include <wx/clrpicker.h>
 
 #include "Layer.h"
+#include "Selection.h"
 
 using namespace HOWL;
 
@@ -90,7 +91,14 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 	
 	if (!event.ControlDown()) activeProject->selection.clear();
 	activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
-
+	
+	// if controli s down check status of current clicked box
+	// send on/off event
+	
+	// otherwise, if this isnt a selected box already,
+	// send a deslect event for current selection,
+	// send event for new selection
+	
 	if (eventTarget) {
 		wxCommandEvent fin_evt(SELECTION_ON, eventTarget);
 		fin_evt.SetEventObject(this);
