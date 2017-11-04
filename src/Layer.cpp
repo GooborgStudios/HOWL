@@ -12,7 +12,7 @@
 	#include <wx/wx.h>
 #endif
 
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -24,7 +24,7 @@
 #include <cassert>
 #include <utility>
 
-#include "NightwaveCore/Helpers.h"
+#include "NightwaveCore/NightwaveCore.h"
 #include "Project.h"
 
 using namespace HOWL;

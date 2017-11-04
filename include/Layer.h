@@ -18,6 +18,8 @@
 #include <map>
 #include <utility>
 
+#include "NightwaveCore/NightwaveCore.h"
+
 #define PLAYBACK_DEBUG 0
 
 namespace HOWL {
@@ -30,7 +32,7 @@ namespace HOWL {
 
 	class Layer;
 
-	class Keyframe {
+	class EXPORT Keyframe {
 		public:
 			std::string name;
 			SmootherType smoother;
@@ -47,7 +49,7 @@ namespace HOWL {
 
 	typedef std::vector<Keyframe *>::iterator KeyframeIterator;
 
-	class DoubleKeyframe: public Keyframe {
+	class EXPORT DoubleKeyframe: public Keyframe {
 		public:
 			double value;
 			DoubleKeyframe(std::string name, long time, double value);
@@ -56,7 +58,7 @@ namespace HOWL {
 			std::string serialize();
 	};
 
-	class StringKeyframe: public Keyframe {
+	class EXPORT StringKeyframe: public Keyframe {
 		public:
 			std::string *value;
 			StringKeyframe(std::string name, long time, std::string *value);
@@ -64,7 +66,7 @@ namespace HOWL {
 			std::string serialize();
 	};
 
-	class KeyframeSet {
+	class EXPORT KeyframeSet {
 		protected:
 			KeyframeIterator prevKF;
 			KeyframeIterator nextKF;
@@ -86,7 +88,7 @@ namespace HOWL {
 			Keyframe *getSecond();
 	};
 
-	class Layer {
+	class EXPORT Layer {
 		public:
 			Layer();
 			Layer(std::string d);
@@ -105,5 +107,5 @@ namespace HOWL {
 
 	typedef std::vector<Layer *>::iterator LayerIterator;
 
-	bool is_sooner(Keyframe *a, Keyframe *b);
+	EXPORT bool is_sooner(Keyframe *a, Keyframe *b);
 }

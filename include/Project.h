@@ -15,10 +15,11 @@
 #include <vector>
 #include <string>
 
+#include "NightwaveCore/NightwaveCore.h"
 #include "Layer.h"
 
 namespace HOWL {
-	class Project {
+	class EXPORT Project {
 		protected:
 			std::string filePath = "";
 		
