@@ -15,12 +15,13 @@
 #include <wx/dcbuffer.h>
 #include <wx/vscroll.h>
 
+#include "NightwaveCore/NightwaveCore.h"
 #include "Project.h"
 #include "Layer.h"
 
 namespace HOWL {
 	// Timeline panel
-	class TimelinePanel: public wxHVScrolledWindow {
+	class EXPORT TimelinePanel: public wxHVScrolledWindow {
 		public:
 			TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *project, wxWindowID eventTarget);
 			~TimelinePanel();

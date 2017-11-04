@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 
+#include "NightwaveCore/NightwaveCore.h"
 #include "Layer.h"
 #include "Selection.h"
 
@@ -27,8 +28,7 @@ namespace HOWL {
 	/**
 	 * @brief   The abstract Project class that holds all project data.
 	 */
-	class Project {
-		
+	class EXPORT Project {
 		protected:
 			std::string filePath = "";
 		
