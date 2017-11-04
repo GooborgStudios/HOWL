@@ -21,26 +21,9 @@
 #include <string>
 
 #include "Layer.h"
+#include "Selection.h"
 
 namespace HOWL {
-	
-	struct SingleSelection {
-		KeyframeSet *set;
-		long start;
-		long end;
-	};
-
-	class Selection {
-		public:
-			std::vector<SingleSelection *> sel;
-		
-			Selection();
-			void clear();
-			void add(KeyframeSet *set, long start, long end);
-			void toggle(KeyframeSet *set, long start, long end);
-            bool matches(Keyframe *kf);
-	};
-	
 	/**
 	 * @brief   The abstract Project class that holds all project data.
 	 */

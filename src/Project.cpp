@@ -16,42 +16,12 @@
 #include <string>
 
 #include "Layer.h"
+#include "Selection.h"
 
 using namespace HOWL;
 
 wxDEFINE_EVENT(HOWL::PROJECT_SAVED, wxCommandEvent);
 wxDEFINE_EVENT(HOWL::PROJECT_LOADED, wxCommandEvent);
-
-Selection::Selection() {
-	clear();
-}
-
-void Selection::clear() {
-	sel.clear();
-}
-
-void Selection::add(KeyframeSet *set, long start, long end) {
-	SingleSelection *newsel = new SingleSelection;
-	newsel->set = set;
-	newsel->start = start;
-	newsel->end = end;
-	sel.push_back(newsel);
-}
-
-void Selection::toggle(KeyframeSet *set, long start, long end) {
-	// XXX Implement me!
-}
-
-bool Selection::matches(Keyframe *kf) {
-	for (SingleSelection *s : sel) {
-		if (s->set == NULL || !s->set) continue;
-		if (s->set->name == kf->name
-			&& s->start <= kf->time
-			&& s->end > kf->time) return true;
-	}
-	
-	return false;
-}
 
 void Project::seek(long newTime) {
 	currentTime = newTime;
