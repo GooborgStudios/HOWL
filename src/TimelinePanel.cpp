@@ -89,8 +89,17 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 		return;
 	}
 	
-	if (!event.ControlDown()) activeProject->selection.clear();
-	activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
+	if (!event.ControlDown()) {
+		for (auto s: activeProject->selection.sel) {
+			if (eventTarget) {
+				SelectionEvent fin_evt(SELECTION_OFF, eventTarget, *s);
+				fin_evt.SetEventObject(this);
+				wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
+			}
+		}
+		activeProject->selection.clear();
+	}
+	SingleSelection *sel = activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 	
 	// if controli s down check status of current clicked box
 	// send on/off event
@@ -100,9 +109,9 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 	// send event for new selection
 	
 	if (eventTarget) {
-		wxCommandEvent fin_evt(SELECTION_ON, eventTarget);
+		SelectionEvent fin_evt(SELECTION_ON, eventTarget, *sel);
+		fin_evt.forceRefresh();
 		fin_evt.SetEventObject(this);
-//		fin_evt.SetInt(playhead / ticksPerCol);
 		wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
 	}
 	
