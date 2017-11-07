@@ -24,9 +24,9 @@ namespace HOWL {
 		
 			Selection();
 			Selection(Selection *other);
-		
+
 			void clear();
-			void add(KeyframeSet *set, long start, long end);
+			SingleSelection *add(KeyframeSet *set, long start, long end);
 			void toggle(KeyframeSet *set, long start, long end);
 			bool matches(Keyframe *kf);
 	};

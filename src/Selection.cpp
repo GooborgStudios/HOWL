@@ -30,12 +30,14 @@ void Selection::clear() {
 	sel.clear();
 }
 
-void Selection::add(KeyframeSet *set, long start, long end) {
+SingleSelection *Selection::add(KeyframeSet *set, long start, long end) {
 	SingleSelection *newsel = new SingleSelection;
 	newsel->set = set;
 	newsel->start = start;
 	newsel->end = end;
 	sel.push_back(newsel);
+
+	return newsel;
 }
 
 void Selection::toggle(KeyframeSet *set, long start, long end) {
