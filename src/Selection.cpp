@@ -59,6 +59,14 @@ SelectionEvent::SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSe
 	
 };
 
+void SelectionEvent::forceRefresh() {
+	should_refresh = true;
+}
+
+void SelectionEvent::doRefresh() {
+	return should_refresh;
+}
+
 void SelectionEvent::SetSelection(SingleSelection selection) {
 	m_selection = selection;
 }
