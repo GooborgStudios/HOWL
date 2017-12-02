@@ -23,6 +23,7 @@
 #include <cmath>
 #include <cassert>
 #include <utility>
+#include <iterator>
 
 #include "NightwaveCore/NightwaveCore.h"
 #include "Project.h"
@@ -95,19 +96,35 @@ KeyframeSet::KeyframeSet(std::string name, Layer *parent) {
 void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 	auto iters = getSurroundingKeyframes(keyframe->time);
 
-	if (iters.second == keyframes.end()) {
+	std::cout << keyframe->time << " - ";
+
+	if (iters.first == keyframes.end() ) {
+		std::cout << "-*- Empty -*- " << keyframe->serialize() << std::endl;
+		keyframes.push_back(keyframe);
+	} else if (keyframe->time == (*iters.first)->time) {
+		Keyframe *oldKF = *iters.first;
+		std::cout << "-*- Replace -*- " << keyframe->serialize() << ", "
+			<< "Index: " << iters.first - keyframes.begin() << ", "
+			<< "After: " << (*iters.first)->serialize();
+		if ( iters.second != keyframes.end() ) {
+			std::cout << ", Before: " << (*iters.second)->serialize();
+		}
+		std::cout << std::endl;
+		*iters.first = keyframe;
+		delete oldKF;
+	} else if (iters.second == keyframes.end()) {
+		std::cout << "-*- Append -*- " << keyframe->serialize() << ", "
+		<< "Index: " << iters.first - keyframes.begin() << ", "
+		<< "After: " << (*iters.first)->serialize() << std::endl;
 		keyframes.push_back(keyframe);
 	} else {
-		if (keyframe->time == (*iters.first)->time) {
-			Keyframe *oldKF = *iters.first;
-			*iters.first = keyframe;
-			delete oldKF;
-		} else {
-			int kftime = (*nextKF)->time;
-			int oldcapacity = keyframes.capacity();
-			keyframes.insert(iters.first, keyframe);
-			if (kftime >= keyframe->time || oldcapacity != keyframes.capacity()) seek(keyframe->time);
-		}
+		//std::cout << "Insert" << std::endl;
+		std::cout << " -*- Insert -*- " << keyframe->serialize() << ", "
+			<< "Index: " << iters.first - keyframes.begin() << ", "
+			<< "After: " << (*iters.first)->serialize() << ", "
+			<< "Before: " << (*iters.second)->serialize()
+			<< std::endl;
+		keyframes.insert(std::next(iters.first), keyframe);
 	}
 	
 	seek(keyframe->time);
