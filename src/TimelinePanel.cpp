@@ -178,9 +178,6 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 	
     Selection sel = activeProject->selection;
 
-	canvas.SetPen(*wxBLACK_PEN);
-	canvas.DrawLine(bounding_box.GetLeft(), bounding_box.GetHeight(), bounding_box.GetRight(), bounding_box.GetHeight());
-	
 	for (auto iter: keyframes->keyframes) {
 		auto time = iter->time;
 		// XXX Need to check currently active keyframes, not just keyframes starting before first column time
