@@ -145,7 +145,7 @@ std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyfram
 	
 	while (after - before > 1) {
 		i = before + (after-before) / 2;
-		if (keyframes[i]->time > time) after = i+1;
+		if (keyframes[i]->time > time) after = i;
 		else if (i+1 >= after) before = after - 1;
 		else if (keyframes[i+1]->time <= time) before = i;
 		else if (keyframes[i]->time <= time) {
