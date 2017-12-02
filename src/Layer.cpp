@@ -93,42 +93,26 @@ KeyframeSet::KeyframeSet(std::string name, Layer *parent) {
 	this->nextKF = keyframes.end();
 }
 
-void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
+void KeyframeSet::AddKeyframe(Keyframe *keyframe, bool do_replace) {
+	// If do_replace is true, then replace any keyframes that are already at the specified time, otherwise ignore the new keyframe
 	auto iters = getSurroundingKeyframes(keyframe->time);
 
-	std::cout << keyframe->time << " - ";
-
 	if (iters.first == keyframes.end()) {
-		std::cout << "-*- Empty -*- " << keyframe->serialize() << std::endl;
 		keyframes.push_back(keyframe);
 	} else if (keyframe->time == (*iters.first)->time) {
-		Keyframe *oldKF = *iters.first;
-		std::cout << "-*- Replace -*- " << keyframe->serialize() << ", "
-			<< "Index: " << iters.first - keyframes.begin() << ", "
-			<< "After: " << (*iters.first)->serialize();
-		if (iters.second != keyframes.end()) {
-			std::cout << ", Before: " << (*iters.second)->serialize();
+		if (do_replace) {
+			Keyframe *oldKF = *iters.first;
+			*iters.first = keyframe;
+			delete oldKF;
 		}
-		std::cout << std::endl;
-		*iters.first = keyframe;
-		delete oldKF;
 	} else if (iters.second == keyframes.end()) {
-		std::cout << "-*- Append -*- " << keyframe->serialize() << ", "
-		<< "Index: " << iters.first - keyframes.begin() << ", "
-		<< "After: " << (*iters.first)->serialize() << std::endl;
 		keyframes.push_back(keyframe);
 	} else {
-		//std::cout << "Insert" << std::endl;
-		std::cout << " -*- Insert -*- " << keyframe->serialize() << ", "
-			<< "Index: " << iters.first - keyframes.begin() << ", "
-			<< "After: " << (*iters.first)->serialize() << ", "
-			<< "Before: " << (*iters.second)->serialize()
-			<< std::endl;
 		keyframes.insert(std::next(iters.first), keyframe);
 	}
-	
+
 	seek(keyframe->time);
-	
+
 	if (prevKF == keyframes.end() || (keyframe->time < currentTime && currentTime - keyframe->time < currentTime - (*prevKF)->time)) {
 		prevKF = iters.first;
 	} else if (nextKF == keyframes.end() || (keyframe->time > currentTime && keyframe->time - currentTime < (*nextKF)->time - currentTime)) {

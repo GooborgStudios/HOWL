@@ -79,7 +79,7 @@ namespace HOWL {
 		
 			KeyframeSet(std::string name, Layer *parent);
 		
-			void AddKeyframe(Keyframe *f);
+			void AddKeyframe(Keyframe *f, bool do_replace = true);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
