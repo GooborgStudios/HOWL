@@ -71,15 +71,15 @@ namespace HOWL {
 			KeyframeIterator prevKF;
 			KeyframeIterator nextKF;
 			Layer *parent;
-		public:
+			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
+	public:
+			std::vector<Keyframe *> keyframes; // XXX make me protected
 			std::string name;
-			std::vector<Keyframe *> keyframes;
 			long currentTime;
 		
 			KeyframeSet(std::string name, Layer *parent);
 		
 			void AddKeyframe(Keyframe *f);
-			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
