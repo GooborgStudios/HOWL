@@ -122,15 +122,19 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
 	int before = 0, after = keyframes.size();
 	int i;
-	
+
+	// we've already found them, or there are no keyframes
 	if (currentTime == time || after == 0) return std::pair<KeyframeIterator, KeyframeIterator>(prevKF, nextKF);
 	
 	while (after - before > 1) {
 		i = before + (after-before) / 2;
 		if (keyframes[i]->time > time) after = i+1;
-		else if (i+1 >= after) break;
+		else if (i+1 >= after) before = after - 1;
 		else if (keyframes[i+1]->time <= time) before = i;
-		else if (keyframes[i]->time <= time) break;
+		else if (keyframes[i]->time <= time) {
+			before = i;
+			after = i+1;
+		};
 	}
 	
 	return std::pair<KeyframeIterator, KeyframeIterator>(keyframes.begin()+before, keyframes.begin()+after);
