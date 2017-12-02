@@ -91,6 +91,9 @@ namespace HOWL {
 	};
 
 	class EXPORT Layer {
+		protected:
+			std::vector<KeyframeSet *> keyframes;
+
 		public:
 			Layer();
 			Layer(std::string d);
@@ -98,8 +101,7 @@ namespace HOWL {
 			std::string description;
 			std::string type;
 
-			std::vector<KeyframeSet *> keyframes;
-
+			std::vector<std::string> getSetNames();
 			KeyframeSet *findSet(std::string type);
 			KeyframePair getSurroundingKeyframes(std::string name, long time);
 			KeyframePair getSurroundingKeyframes(std::string name);

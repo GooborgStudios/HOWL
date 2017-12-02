@@ -198,6 +198,12 @@ Layer::Layer(std::string description) {
 	this->description = description;
 }
 
+std::vector<std::string> Layer::getSetNames() {
+	std::vector<std::string> names;
+	for (KeyframeSet *set : keyframes) names.push_back(set->name);
+	return names;
+}
+
 KeyframeSet *Layer::findSet(std::string name) {
 	for (auto kf: keyframes) {
 		if (kf->name == name) return kf;

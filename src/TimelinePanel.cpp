@@ -53,8 +53,8 @@ void TimelinePanel::setProject(Project *project) {
 	int rows = 0;
 	for (auto l: activeProject->layers) {
 		if (true /* l->isExpanded */) {
-			for (auto k: l->keyframes) {
-				visible_layers[rows] = k;
+			for (auto name: l->getSetNames()) {
+				visible_layers[rows] = l->findSet(name);
 				rows++;
 			}
 		}
