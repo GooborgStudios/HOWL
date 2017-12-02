@@ -48,6 +48,7 @@ namespace HOWL {
 	};
 
 	typedef std::vector<Keyframe *>::iterator KeyframeIterator;
+	typedef std::pair<Keyframe *, Keyframe *> KeyframePair;
 
 	class EXPORT DoubleKeyframe: public Keyframe {
 		public:
