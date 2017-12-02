@@ -40,7 +40,6 @@ namespace HOWL {
 		
 			std::vector<Layer *> layers;
 			Selection selection;
-		
 			
 			/**
 			 * @brief   Saves all project data to the specified file path.
@@ -52,7 +51,6 @@ namespace HOWL {
 			
 			
 			void seek(long newTime); ///< Seeks to the specified tick in the animation.
-			
 
 			bool advanceFrame(long increment); ///< Advances the time by the specified increment of ticks in the animation.
 			
@@ -63,6 +61,8 @@ namespace HOWL {
 			 * @retval FALSE  We are not at the end of the animation yet.
 			 */ 
 			bool eof();
+
+//	void applySelection(void (*selectionCB)(void *), void *data);
 	};
 
 	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
