@@ -73,7 +73,8 @@ namespace HOWL {
 			KeyframeIterator nextKF;
 			Layer *parent;
 			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
-	public:
+
+		public:
 			std::vector<Keyframe *> keyframes; // XXX make me protected
 			std::string name;
 			long currentTime;
@@ -85,9 +86,8 @@ namespace HOWL {
 			bool advanceFrame(long increment);
 			bool eof();
 			double smoother_fraction();
-		
-			Keyframe *getFirst();
-			Keyframe *getSecond();
+
+			friend class Layer;
 	};
 
 	class EXPORT Layer {
@@ -95,17 +95,21 @@ namespace HOWL {
 			Layer();
 			Layer(std::string d);
 
-			std::vector<KeyframeSet *> keyframes;
 			std::string description;
 			std::string type;
-			KeyframeSet *findSet(std::string);
+
+			std::vector<KeyframeSet *> keyframes;
+
+			KeyframeSet *findSet(std::string type);
+			KeyframePair getSurroundingKeyframes(std::string name, long time);
+			KeyframePair getSurroundingKeyframes(std::string name);
 			void AddKeyframe(Keyframe *f);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
 		
-			double getDouble(std::string type);
-			std::string *getString(std::string type);
+			double getDouble(std::string name);
+			std::string *getString(std::string name);
 	};
 
 	typedef std::vector<Layer *>::iterator LayerIterator;

@@ -191,16 +191,6 @@ double KeyframeSet::smoother_fraction() {
 	return (currentTime - (*prevKF)->time) / dur;
 }
 
-Keyframe *KeyframeSet::getFirst() {
-	if (prevKF == keyframes.end()) return NULL;
-	return *prevKF;
-}
-
-Keyframe *KeyframeSet::getSecond() {
-	if (nextKF == keyframes.end()) return NULL;
-	return *nextKF;
-}
-
 Layer::Layer() {
 	description = "";
 };
@@ -214,6 +204,30 @@ KeyframeSet *Layer::findSet(std::string name) {
 		if (kf->name == name) return kf;
 	}
 	return NULL;
+}
+
+KeyframePair Layer::getSurroundingKeyframes(std::string name, long time) {
+	KeyframePair value;
+
+	KeyframeSet *set = findSet(name);
+	if (set == NULL) return KeyframePair(NULL, NULL);
+
+	std::pair<KeyframeIterator, KeyframeIterator> kf = set->getSurroundingKeyframes(time);
+	value.first = kf.first == set->keyframes.end() ? NULL : (*kf.first);
+	value.second = kf.second == set->keyframes.end() ? NULL : (*kf.second);
+
+	return value;
+}
+
+KeyframePair Layer::getSurroundingKeyframes(std::string name) {
+	KeyframePair value;
+	KeyframeSet *set = findSet(name);
+	if (set == NULL) return KeyframePair(NULL, NULL);
+
+	value.first = set->prevKF == set->keyframes.end() ? NULL : (*set->prevKF);
+	value.second = set->nextKF == set->keyframes.end() ? NULL : (*set->nextKF);
+
+	return value;
 }
 
 void Layer::AddKeyframe(Keyframe *keyframe) {
@@ -246,23 +260,23 @@ bool Layer::eof() {
 	return eof;
 }
 
-double Layer::getDouble(std::string type) {
-	KeyframeSet *set = findSet(type);
-	if (set == NULL) return 0.0;
-	
-	DoubleKeyframe *KF1 = (DoubleKeyframe *)(set->getFirst());
-	DoubleKeyframe *KF2 = (DoubleKeyframe *)(set->getSecond());
-	
-	if (KF1 == NULL) return 0.0;
-	if (KF2 == NULL) return KF1->value;
+double Layer::getDouble(std::string name) {
+	KeyframeSet *set = findSet(name);
+	KeyframePair value = getSurroundingKeyframes(name);
+
+	if (!value.first) return 0.0;
+	if (!value.second) return ((DoubleKeyframe *)(value.first))->value;
 	double pos = set->smoother_fraction();
-	return KF1->value - (KF1->value * pos) + (KF2->value * pos); // XXX Simplify me (to get a good grade)!
+
+	return (((DoubleKeyframe *)(value.first))->value * (1 - pos))
+		+ (((DoubleKeyframe *)(value.second))->value * pos);
 }
 
-std::string *Layer::getString(std::string type) {
-	KeyframeSet *set = findSet(type);
-	if (set == NULL || set->getFirst() == NULL) return new std::string("");
-	return ((StringKeyframe *)(set->getFirst()))->value;
+
+std::string *Layer::getString(std::string name) {
+	KeyframePair value = getSurroundingKeyframes(name);
+	if (!value.first) return new std::string("");
+	return ((StringKeyframe *)(value.first))->value;
 }
 
 bool is_sooner(Keyframe *a, Keyframe *b) {
