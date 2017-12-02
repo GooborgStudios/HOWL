@@ -98,7 +98,7 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 
 	std::cout << keyframe->time << " - ";
 
-	if (iters.first == keyframes.end() ) {
+	if (iters.first == keyframes.end()) {
 		std::cout << "-*- Empty -*- " << keyframe->serialize() << std::endl;
 		keyframes.push_back(keyframe);
 	} else if (keyframe->time == (*iters.first)->time) {
@@ -106,7 +106,7 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 		std::cout << "-*- Replace -*- " << keyframe->serialize() << ", "
 			<< "Index: " << iters.first - keyframes.begin() << ", "
 			<< "After: " << (*iters.first)->serialize();
-		if ( iters.second != keyframes.end() ) {
+		if (iters.second != keyframes.end()) {
 			std::cout << ", Before: " << (*iters.second)->serialize();
 		}
 		std::cout << std::endl;
