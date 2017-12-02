@@ -180,12 +180,6 @@ void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *k
 
 	for (auto iter: keyframes->keyframes) {
 		auto time = iter->time;
-		// XXX Need to check currently active keyframes, not just keyframes starting before first column time
-		//if (time < (col1time - activeProject->ticksPerBeat)) {
-			// starting_velocity = velocity;
-			// continue;
-		// }
-		// draw the box from 0 to iter->time with starting_velocity if it exists
 		double col = (time - col1time) / (ticksPerCol * 1.0);
 		if (col < 0.0) col = 0.0;
 		if (col > lastCol) lastCol = (int)(col);
