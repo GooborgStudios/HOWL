@@ -12,7 +12,6 @@
 	#include <wx/wx.h>
 #endif
 
-//#include <sys/time.h>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -236,7 +235,6 @@ void Layer::AddKeyframe(Keyframe *keyframe) {
 		found = new KeyframeSet(keyframe->name, this);
 		keyframes.push_back(found);
 	}
-//	if (keyframes.find(type) == keyframes.end()) keyframes[type] = new KeyframeSet(this);
 	found->AddKeyframe(keyframe);
 }
 

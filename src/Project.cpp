@@ -44,9 +44,3 @@ bool Project::eof() {
 	}
 	return eof;
 }
-
-//void Project::applySelection(void (*selectionCB)(void *), void *data) {
-//	for (auto s : selection.sel) {
-//
-//	}
-//}

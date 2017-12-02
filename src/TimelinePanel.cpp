@@ -70,13 +70,11 @@ void TimelinePanel::setEventTarget(wxWindowID eventTarget) {
 }
 
 void TimelinePanel::paintEvent(wxPaintEvent &WXUNUSED(event)) {
-	// depending on your system you may need to look at double-buffered dcs
 	wxPaintDC canvas(this);
 	render(canvas);
 }
 
 void TimelinePanel::paintNow() {
-	// depending on your system you may need to look at double-buffered dcs
 	wxClientDC canvas(this);
 	render(canvas);
 }
@@ -314,7 +312,6 @@ wxCoord TimelinePanel::OnGetRowHeight(size_t row) const {
 
 wxCoord TimelinePanel::OnGetColumnWidth(size_t column) const {
 	return colsize;
-	//	return wxClientDC(this).GetSize().GetX();
 }
 
 double TimelinePanel::colsPerBeat() {

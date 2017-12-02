@@ -73,8 +73,6 @@ namespace HOWL {
 			void movePlayhead(int time);
 			void zoom(int percent);
 			int getPlayhead();
-			// void RefreshDisplay();
-			// void ChangeNoteColor(wxCommandEvent &event);
 		
 			wxDECLARE_EVENT_TABLE();
 	};

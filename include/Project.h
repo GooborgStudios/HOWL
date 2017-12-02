@@ -59,10 +59,8 @@ namespace HOWL {
 			 *
 			 * @retval TRUE   We're at the end of the animation.
 			 * @retval FALSE  We are not at the end of the animation yet.
-			 */ 
+			 */
 			bool eof();
-
-//	void applySelection(void (*selectionCB)(void *), void *data);
 	};
 
 	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
