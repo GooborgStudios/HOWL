@@ -36,6 +36,8 @@ TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *pro
 	
 	setEventTarget(eventTarget);
 	setProject(project);
+
+	Bind(HOWL::DISPLAY_REFRESH, &TimelinePanel::refreshNow, this);
 }
 
 TimelinePanel::~TimelinePanel() {
@@ -77,6 +79,10 @@ void TimelinePanel::paintNow() {
 	// depending on your system you may need to look at double-buffered dcs
 	wxClientDC canvas(this);
 	render(canvas);
+}
+
+void TimelinePanel::refreshNow(wxCommandEvent &WXUNUSED(event)) {
+	paintNow();
 }
 
 void TimelinePanel::onLeftDown(wxMouseEvent &event) {

@@ -29,6 +29,7 @@ namespace HOWL {
 			void setEventTarget(wxWindowID eventTarget);
 			void paintEvent(wxPaintEvent &event);
 			void paintNow();
+			void refreshNow(wxCommandEvent &event);
 			void onLeftDown(wxMouseEvent &event);
 			void onMouseMove(wxMouseEvent &event);
 			void onLeftUp(wxMouseEvent &event);
