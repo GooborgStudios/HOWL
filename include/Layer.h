@@ -34,17 +34,15 @@ namespace HOWL {
 
 	class EXPORT Keyframe {
 		public:
+			Keyframe();
+			Keyframe(std::string name, long time);
+			virtual std::string serialize();
+			void toBuffer(char *outbuf, int len);
+			virtual void render(wxDC &canvas, wxRect bounding_box);
+
 			std::string name;
 			SmootherType smoother;
 			long time;
-
-			Keyframe();
-			Keyframe(std::string name, long time);
-		
-			virtual std::string serialize();
-			void toBuffer(char *outbuf, int len);
-		
-			virtual void render(wxDC &canvas, wxRect bounding_box);
 	};
 
 	typedef std::vector<Keyframe *>::iterator KeyframeIterator;
@@ -52,66 +50,66 @@ namespace HOWL {
 
 	class EXPORT DoubleKeyframe: public Keyframe {
 		public:
-			double value;
 			DoubleKeyframe(std::string name, long time, double value);
 			DoubleKeyframe(std::string name, long time, float value);
 			DoubleKeyframe(std::string name, long time, int value);
 			std::string serialize();
+
+			double value;
 	};
 
 	class EXPORT StringKeyframe: public Keyframe {
 		public:
-			std::string *value;
 			StringKeyframe(std::string name, long time, std::string *value);
 			StringKeyframe(std::string name, long time, const char *value);
 			std::string serialize();
+
+			std::string *value;
 	};
 
 	class EXPORT KeyframeSet {
-		protected:
-			KeyframeIterator prevKF;
-			KeyframeIterator nextKF;
-			Layer *parent;
-			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
-
 		public:
-			std::vector<Keyframe *> keyframes; // XXX make me protected
-			std::string name;
-			long currentTime;
-		
 			KeyframeSet(std::string name, Layer *parent);
-		
 			void AddKeyframe(Keyframe *f, bool do_replace = true);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
 			double smoother_fraction();
 
+			std::vector<Keyframe *> keyframes; // XXX make me protected
+			std::string name;
+			long currentTime;
+
 			friend class Layer;
+
+		protected:
+			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
+
+			KeyframeIterator prevKF;
+			KeyframeIterator nextKF;
+			Layer *parent;
 	};
 
 	class EXPORT Layer {
-		protected:
-			std::vector<KeyframeSet *> keyframes;
-
 		public:
 			Layer();
 			Layer(std::string d);
-
-			std::string description;
-			std::string type;
-
 			std::vector<std::string> getSetNames();
 			KeyframeSet *findSet(std::string type);
-			KeyframePair getSurroundingKeyframes(std::string name, long time);
 			KeyframePair getSurroundingKeyframes(std::string name);
+			KeyframePair getSurroundingKeyframes(std::string name, long time);
 			void AddKeyframe(Keyframe *f);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
-		
 			double getDouble(std::string name);
 			std::string *getString(std::string name);
+
+			std::string description;
+			std::string type;
+
+		protected:
+			std::vector<KeyframeSet *> keyframes;
 	};
 
 	typedef std::vector<Layer *>::iterator LayerIterator;

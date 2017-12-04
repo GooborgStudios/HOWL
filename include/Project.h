@@ -29,9 +29,6 @@ namespace HOWL {
 	 * @brief   The abstract Project class that holds all project data.
 	 */
 	class EXPORT Project {
-		protected:
-			std::string filePath = "";
-		
 		public:
 			int BPM = 120;
 			int ticksPerBeat = 32;
@@ -61,6 +58,9 @@ namespace HOWL {
 			 * @retval FALSE  We are not at the end of the animation yet.
 			 */
 			bool eof();
+
+		protected:
+			std::string filePath = "";
 	};
 
 	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);

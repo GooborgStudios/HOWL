@@ -20,15 +20,14 @@ namespace HOWL {
 	
 	class Selection {
 		public:
-			std::vector<SingleSelection *> sel;
-		
 			Selection();
 			Selection(Selection *other);
-
 			void clear();
 			SingleSelection *add(KeyframeSet *set, long start, long end);
 			void toggle(KeyframeSet *set, long start, long end);
 			bool matches(Keyframe *kf);
+
+			std::vector<SingleSelection *> sel;
 	};
 	
 	class SelectionEvent : public wxEvent {
@@ -36,7 +35,6 @@ namespace HOWL {
 			SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection);
 			void forceRefresh();
 			void doRefresh();
-		
 			void SetSelection(SingleSelection selection);
 			SingleSelection GetSelection() const;
 			wxEvent* Clone() const;
