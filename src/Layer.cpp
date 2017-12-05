@@ -39,6 +39,10 @@ Keyframe::Keyframe(std::string name, long time) {
 	this->smoother = SMOOTH_LINEAR;
 }
 
+Keyframe::~Keyframe() {
+
+}
+
 std::string Keyframe::serialize() {
 	return "";
 }

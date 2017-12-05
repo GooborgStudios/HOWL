@@ -36,6 +36,7 @@ namespace HOWL {
 		public:
 			Keyframe();
 			Keyframe(std::string name, long time);
+			virtual ~Keyframe();
 			virtual std::string serialize();
 			void toBuffer(char *outbuf, int len);
 			virtual void render(wxDC &canvas, wxRect bounding_box);
