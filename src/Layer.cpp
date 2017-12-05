@@ -84,6 +84,10 @@ StringKeyframe::StringKeyframe(std::string name, long time, const char *value) :
 	this->smoother = SMOOTH_HOLD;
 };
 
+StringKeyframe::~StringKeyframe() {
+	delete value;
+}
+
 std::string StringKeyframe::serialize() {
 	return *value;
 }

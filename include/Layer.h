@@ -63,6 +63,7 @@ namespace HOWL {
 		public:
 			StringKeyframe(std::string name, long time, std::string *value);
 			StringKeyframe(std::string name, long time, const char *value);
+			~StringKeyframe();
 			std::string serialize();
 
 			std::string *value;
