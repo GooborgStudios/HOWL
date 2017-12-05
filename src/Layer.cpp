@@ -119,6 +119,24 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe, bool do_replace) {
 	}
 }
 
+void KeyframeSet::removeKeyframes(KeyframePair keyframepair) {
+	std::pair<KeyframeIterator, KeyframeIterator> pair1, pair2;
+	pair1 = getSurroundingKeyframes(keyframepair.first->time);
+	pair2 = getSurroundingKeyframes(keyframepair.second->time);
+
+	while ((*pair1.first)->time < keyframepair.first->time) {
+		pair1.first++;
+	}
+
+	keyframes.erase(pair1.first, pair2.second);
+}
+void KeyframeSet::removeKeyframes(Keyframe *first, Keyframe *second) {
+	KeyframePair pair;
+	pair.first = first;
+	pair.second = second;
+	removeKeyframes(pair);
+}
+
 #define USE_STUPID_SEEK
 
 #ifdef USE_STUPID_SEEK
@@ -243,6 +261,14 @@ void Layer::AddKeyframe(Keyframe *keyframe) {
 	}
 	found->AddKeyframe(keyframe);
 }
+
+void Layer::removeKeyframes(KeyframePair keyframepair) {
+	KeyframeSet *set = findSet(keyframepair.first->name);
+	assert(set);
+	set->removeKeyframes(keyframepair);
+}
+
+
 
 void Layer::seek(long newTime) {
 	for (auto iter : keyframes) iter->seek(newTime);

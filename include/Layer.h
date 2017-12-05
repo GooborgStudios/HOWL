@@ -71,6 +71,8 @@ namespace HOWL {
 		public:
 			KeyframeSet(std::string name, Layer *parent);
 			void AddKeyframe(Keyframe *f, bool do_replace = true);
+			void removeKeyframes(KeyframePair keyframepair);
+			void removeKeyframes(Keyframe *first, Keyframe *second);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
@@ -99,6 +101,7 @@ namespace HOWL {
 			KeyframePair getSurroundingKeyframes(std::string name);
 			KeyframePair getSurroundingKeyframes(std::string name, long time);
 			void AddKeyframe(Keyframe *f);
+			void removeKeyframes(KeyframePair keyframepair);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
