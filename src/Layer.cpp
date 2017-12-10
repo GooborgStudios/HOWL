@@ -43,6 +43,10 @@ Keyframe::~Keyframe() {
 
 }
 
+bool Keyframe::operator==(Keyframe &a) {
+	return false;
+}
+
 std::string Keyframe::serialize() {
 	return "";
 }

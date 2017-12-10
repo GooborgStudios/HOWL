@@ -41,6 +41,8 @@ namespace HOWL {
 			void toBuffer(char *outbuf, int len);
 			virtual void render(wxDC &canvas, wxRect bounding_box);
 
+			virtual bool operator==(Keyframe &a);
+
 			std::string name;
 			SmootherType smoother;
 			long time;
@@ -55,6 +57,8 @@ namespace HOWL {
 			DoubleKeyframe(std::string name, long time, float value);
 			DoubleKeyframe(std::string name, long time, int value);
 			std::string serialize();
+		
+			// virtual bool operator==(DoubleKeyframe &a); // XXX Implement me!
 
 			double value;
 	};
@@ -65,6 +69,8 @@ namespace HOWL {
 			StringKeyframe(std::string name, long time, const char *value);
 			~StringKeyframe();
 			std::string serialize();
+
+			// virtual bool operator==(StringKeyframe &a); // XXX Implement me!
 
 			std::string *value;
 	};
