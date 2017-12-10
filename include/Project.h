@@ -30,14 +30,6 @@ namespace HOWL {
 	 */
 	class EXPORT Project {
 		public:
-			int BPM = 120;
-			int ticksPerBeat = 32;
-			int beatsPerMeasure = 4;
-			long currentTime = 0;
-		
-			std::vector<Layer *> layers;
-			Selection selection;
-			
 			/**
 			 * @brief   Saves all project data to the specified file path.
 			 */ 
@@ -58,6 +50,14 @@ namespace HOWL {
 			 * @retval FALSE  We are not at the end of the animation yet.
 			 */
 			bool eof();
+
+			int BPM = 120;
+			int ticksPerBeat = 32;
+			int beatsPerMeasure = 4;
+			long currentTime = 0;
+		
+			std::vector<Layer *> layers;
+			Selection selection;
 
 		protected:
 			std::string filePath = "";
