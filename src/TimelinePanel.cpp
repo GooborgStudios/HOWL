@@ -249,6 +249,7 @@ void TimelinePanel::render_header_segment(wxDC &canvas, int col, int xpos) {
 	int div = (int)(col * divsPerBeat / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
 	int tick = (col * ticksPerCol) % (activeProject->ticksPerBeat / divsPerBeat) + 1;
 
+	// XXX This should be more efficient!
 	if (beat == 1 && div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d", measure);
 	else if (div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
 	else if (tick == 1) snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
