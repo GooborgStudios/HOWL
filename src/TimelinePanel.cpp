@@ -272,7 +272,7 @@ void TimelinePanel::render_selection(wxDC &canvas, Selection sel) {
 		
 		int i=0;
 		for (; i<visible_layers.size(); i++) {
-			if (visible_layers[i]->name == s->set->name) break;
+			if (visible_layers[i] == s->set) break;
 		}
 		
 		wxRect bounding_box = wxRect(index_to_screenpos(wxPoint(s->start/ticksPerCol, i)), index_to_screenpos(wxPoint(s->end/ticksPerCol, i+1)));
