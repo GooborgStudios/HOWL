@@ -103,6 +103,11 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 		}
 		activeProject->selection.clear();
 	}
+	if (btn.y >= visible_layers.size()) {
+		paintNow();
+		return;
+	}
+
 	SingleSelection *sel = activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 	
 	// if controli s down check status of current clicked box
