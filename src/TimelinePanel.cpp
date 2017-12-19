@@ -135,6 +135,11 @@ void TimelinePanel::onLeftUp(wxMouseEvent &WXUNUSED(event)) {
 }
 
 void TimelinePanel::render(wxDC &canvas) {
+	canvas.SetBrush(*wxWHITE_BRUSH);
+	canvas.SetPen(*wxTRANSPARENT_PEN);
+	canvas.DrawRectangle(wxPoint(0, 0), canvas.GetSize());
+	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+
 	int width = canvas.GetSize().GetX();
 	int xpos = labelsize-(GetVisibleBegin().GetCol()*colsize);
 	int ypos = headersize-(GetVisibleBegin().GetRow()*rowsize);
@@ -262,7 +267,7 @@ void TimelinePanel::render_selection(wxDC &canvas, Selection sel) {
 		if (s->set == NULL) return;
 		
 		canvas.SetBrush(*wxTRANSPARENT_BRUSH);
-		canvas.SetPen(wxPen(*wxWHITE, 2));
+		canvas.SetPen(wxPen(*wxBLACK, 2));
 		
 		int i=0;
 		for (; i<visible_layers.size(); i++) {
