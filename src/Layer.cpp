@@ -57,7 +57,9 @@ void Keyframe::toBuffer(char *outbuf, int len) {
 }
 
 void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
-	
+	canvas.SetBrush(*wxBLUE_BRUSH);
+	canvas.SetPen(*wxTRANSPARENT_PEN);
+	canvas.DrawRectangle(bounding_box.GetLeft()-(bounding_box.GetHeight()/2), bounding_box.GetTop(), bounding_box.GetHeight(), bounding_box.GetHeight());
 }
 
 DoubleKeyframe::DoubleKeyframe(std::string name, long time, double value) : Keyframe(name, time) {
