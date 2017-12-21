@@ -59,8 +59,8 @@ include(${wxWidgets_USE_FILE})
 target_link_libraries(HOWL ${wxWidgets_LIBRARIES})
 
 find_package(NightwaveCore REQUIRED)
-include_directories(${NIGHTWAVE_CORE_INCLUDE_DIR})
-target_link_libraries(HOWL ${NIGHTWAVE_CORE_LIBRARIES})
+include_directories(${NightwaveCore_INCLUDE_DIR})
+target_link_libraries(HOWL ${NightwaveCore_LIBRARIES})
 
 find_package(Doxygen)
 IF(DOXYGEN_FOUND)
