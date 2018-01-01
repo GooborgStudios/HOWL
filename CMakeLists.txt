@@ -14,7 +14,7 @@ set(TARGET_VERSION_MINOR 1)
 set(TARGET_VERSION_PATCH 0)
 set(TARGET_COPYRIGHT "©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.")
 
-set(CMAKE_BINARY_DIR ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_BINARY_DIR ${PROJECT_BINARY_DIR})
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -36,6 +36,7 @@ add_library(HOWL SHARED
 	${SRC}/Layer.cpp ${INCL}/Layer.h
 	${SRC}/Project.cpp ${INCL}/Project.h
 	${SRC}/TimelinePanel.cpp ${INCL}/TimelinePanel.h
+	${SRC}/Selection.cpp ${INCL}/Selection.h
 )
 
 set(CMAKE_CXX_COMPILER g++)
@@ -58,8 +59,15 @@ include(${wxWidgets_USE_FILE})
 target_link_libraries(HOWL ${wxWidgets_LIBRARIES})
 
 find_package(NightwaveCore REQUIRED)
-include_directories(${NIGHTWAVE_CORE_INCLUDE_DIR})
-target_link_libraries(HOWL ${NIGHTWAVE_CORE_LIBRARIES})
+include_directories(${NightwaveCore_INCLUDE_DIR})
+target_link_libraries(HOWL ${NightwaveCore_LIBRARIES})
+
+find_package(Doxygen)
+IF(DOXYGEN_FOUND)
+	configure_file(${ROOT}/doxygen.conf.in ${BUILD}/doxygen.conf @ONLY)
+	add_custom_target(docs ALL DEPENDS ${BUILD}/doxygen/)
+	add_custom_command(OUTPUT ${BUILD}/doxygen/ COMMAND ${DOXYGEN_EXECUTABLE} ${BUILD}/doxygen.conf DEPENDS ${SRC}/* ${INCL}/* ${ROOT}/README.md ${ROOT}/doxygen.conf.in VERBATIM) # COMMENT "Generating API documentation with Doxygen"
+ENDIF(DOXYGEN_FOUND)
 
 install(TARGETS HOWL DESTINATION lib)
 

@@ -18,6 +18,8 @@
 #include <map>
 #include <utility>
 
+#include "NightwaveCore/NightwaveCore.h"
+
 #define PLAYBACK_DEBUG 0
 
 namespace HOWL {
@@ -30,80 +32,98 @@ namespace HOWL {
 
 	class Layer;
 
-	class Keyframe {
+	class EXPORT Keyframe {
 		public:
+			Keyframe();
+			Keyframe(std::string name, long time);
+			virtual ~Keyframe();
+			virtual std::string serialize();
+			void toBuffer(char *outbuf, int len);
+			virtual void render(wxDC &canvas, wxRect bounding_box);
+
+			virtual bool operator==(Keyframe &a);
+
 			std::string name;
 			SmootherType smoother;
 			long time;
-
-			Keyframe();
-			Keyframe(std::string name, long time);
-		
-			virtual std::string serialize();
-			void toBuffer(char *outbuf, int len);
-		
-			virtual void render(wxDC &canvas, wxRect bounding_box);
 	};
 
 	typedef std::vector<Keyframe *>::iterator KeyframeIterator;
+	typedef std::pair<Keyframe *, Keyframe *> KeyframePair;
 
-	class DoubleKeyframe: public Keyframe {
+	class EXPORT DoubleKeyframe: public Keyframe {
 		public:
-			double value;
 			DoubleKeyframe(std::string name, long time, double value);
 			DoubleKeyframe(std::string name, long time, float value);
 			DoubleKeyframe(std::string name, long time, int value);
 			std::string serialize();
+		
+			// virtual bool operator==(DoubleKeyframe &a); // XXX Implement me!
+
+			double value;
 	};
 
-	class StringKeyframe: public Keyframe {
+	class EXPORT StringKeyframe: public Keyframe {
 		public:
-			std::string *value;
 			StringKeyframe(std::string name, long time, std::string *value);
 			StringKeyframe(std::string name, long time, const char *value);
+			~StringKeyframe();
 			std::string serialize();
+
+			// virtual bool operator==(StringKeyframe &a); // XXX Implement me!
+
+			std::string *value;
 	};
 
-	class KeyframeSet {
-		protected:
-			KeyframeIterator prevKF;
-			KeyframeIterator nextKF;
-			Layer *parent;
+	class EXPORT KeyframeSet {
 		public:
-			std::vector<Keyframe *> keyframes;
-			long currentTime;
-		
-			KeyframeSet(Layer *parent);
-		
-			void AddKeyframe(Keyframe *f);
-			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
+			KeyframeSet(std::string name, Layer *parent);
+			void AddKeyframe(Keyframe *f, bool do_replace = true);
+			void removeKeyframes(KeyframePair keyframepair);
+			void removeKeyframes(Keyframe *first, Keyframe *second);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
 			double smoother_fraction();
-		
-			Keyframe *getFirst();
-			Keyframe *getSecond();
+
+			std::vector<Keyframe *> keyframes; // XXX make me protected
+			std::string name;
+			long currentTime;
+
+			friend class Layer;
+
+		protected:
+			std::pair<KeyframeIterator, KeyframeIterator> getSurroundingKeyframes(long time);
+
+			KeyframeIterator prevKF;
+			KeyframeIterator nextKF;
+			Layer *parent;
 	};
 
-	class Layer {
+	class EXPORT Layer {
 		public:
 			Layer();
 			Layer(std::string d);
-
-			std::map<std::string, KeyframeSet *> keyframes;
-			std::string description;
-			std::string type;
+			std::vector<std::string> getSetNames();
+			KeyframeSet *findSet(std::string type);
+			KeyframePair getSurroundingKeyframes(std::string name);
+			KeyframePair getSurroundingKeyframes(std::string name, long time);
 			void AddKeyframe(Keyframe *f);
+			void removeKeyframes(KeyframePair keyframepair);
 			void seek(long newTime);
 			bool advanceFrame(long increment);
 			bool eof();
-		
-			double getDouble(std::string type);
-			std::string *getString(std::string type);
+			double getDouble(std::string name);
+			std::string *getString(std::string name);
+
+			std::string description;
+			std::string type;
+
+		protected:
+			std::vector<KeyframeSet *> keyframes;
 	};
 
 	typedef std::vector<Layer *>::iterator LayerIterator;
 
-	bool is_sooner(Keyframe *a, Keyframe *b);
+	EXPORT bool is_sooner(Keyframe *a, Keyframe *b);
 }

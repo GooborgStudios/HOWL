@@ -8,12 +8,14 @@ compiler:
   - gcc
   - clang
 
+osx_image: xcode9.2
+
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-add-repository 'deb http://repos.codelite.org/wx3.1.0/ubuntu/ zesty universe' -qq; sudo apt-get update -qq; fi
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 brew install wxwidgets; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 brew install wxwidgets; brew install doxygen; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install libwxbase3.1-0-unofficial libwxbase3.1-dev libwxgtk3.1-0-unofficial libwxgtk3.1-dev wx3.1-headers wx-common libwxgtk-webview3.1-0-unofficial libwxgtk-webview3.1-dev libwxgtk-media3.1-0-unofficial libwxgtk-media3.1-dev libwxbase3.1-0-unofficial-dbg libwxgtk3.1-0-unofficial-dbg libwxgtk-webview3.1-0-unofficial-dbg libwxgtk-media3.1-0-unofficial-dbg wx3.1-i18n wx3.1-examples -qq; fi
   - git submodule update
   - cd submodules/NightwaveCore/C++
@@ -38,7 +40,7 @@ deploy:
   api_key:
     secure: wd0zAwkiTurE2j1RGFrP43Te+SZ2R6KhdXk9ygaHt5PRNRjPXFtYz61/dTDFNBZDUxydgN/rhEoVrL9c/3jcLj+iIYSzcEkYBqvBhV2yq2TlBWL5/3mJsYw934/RSXvgxrABqUQZSwWCf/n7IblxF6suFOLRSPA/dqAnjfQqvDJUu07ksf09mQ4y/mb/+Pec71JmgMtszQNEXMVPMHqa0SFZ+hkcjV2STd2Kn1QSRlItoAKzyQ/NQXIESrQ5VErHihfc8RTAg5LhFTt2KDu3Hzoj6myZ5LNiXSqZCUlw4FunEseQxikAKjKvmGWrQ4O3wqSoe9bYYocV96aIvYTceSMIpo/mk2WLEQpI5Fs4TZ/IOxM1WdAtXgbqDzK82EBeRbLdUGkiwJCm386bF1LNVSjIJ4u3I5uVbpmWW0t9uOGc8qd+l1CE3nNTMVVUBSETeWokyqI52Ji203Ff5UHx9WdsDBxNMF4hGLF/AXcvcbUMpSePZrU/kc5pGwRO8q+yIM5hnfp6JkCD7sizFhBhSByt4UQL3DuS/J+XHIfP4Ikw2U4kEi4Ix8eDCunDHH57Iiwy7D9jQN2shMiCO9CvopAV3DL68RkI2SUzJ4BdzNtEzasrZ+a5ljVY69VTkK6owMyVDxiarwbyl/ATUzKPZzXLCPhCZqkM3+CtmNbsp50=
   skip_cleanup: true
-  file: bin/Debug/libHOWL.dylib
+  file: Debug/libHOWL.dylib
   on:
     repo: VaduNightwave/HOWL
     tags: true

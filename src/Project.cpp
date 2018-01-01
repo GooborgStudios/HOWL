@@ -16,8 +16,12 @@
 #include <string>
 
 #include "Layer.h"
+#include "Selection.h"
 
 using namespace HOWL;
+
+wxDEFINE_EVENT(HOWL::PROJECT_SAVED, wxCommandEvent);
+wxDEFINE_EVENT(HOWL::PROJECT_LOADED, wxCommandEvent);
 
 void Project::seek(long newTime) {
 	currentTime = newTime;

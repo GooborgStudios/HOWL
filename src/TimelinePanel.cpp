@@ -17,6 +17,7 @@
 #include <wx/clrpicker.h>
 
 #include "Layer.h"
+#include "Selection.h"
 
 using namespace HOWL;
 
@@ -32,10 +33,11 @@ TimelinePanel::TimelinePanel(wxPanel *parent, wxWindowID window_id, Project *pro
 	colsize = 40;
 	headersize = 30;
 	labelsize = 40;
-	active_button = wxPoint(0, 0);
-
+	
 	setEventTarget(eventTarget);
 	setProject(project);
+
+	Bind(HOWL::DISPLAY_REFRESH, &TimelinePanel::refreshNow, this);
 }
 
 TimelinePanel::~TimelinePanel() {
@@ -47,9 +49,17 @@ void TimelinePanel::setProject(Project *project) {
 	ticksPerCol = activeProject->ticksPerBeat / 4;
 	colsize = 40;
 	
+	
 	int rows = 0;
-	for (auto l: activeProject->layers) rows += l->keyframes.size();
-	SetRowColumnCount(rows, 1);
+	for (auto l: activeProject->layers) {
+		if (true /* l->isExpanded */) {
+			for (auto name: l->getSetNames()) {
+				visible_layers[rows] = l->findSet(name);
+				rows++;
+			}
+		}
+	}
+	SetRowColumnCount(rows+1, 1);
 	
 	Update();
 	movePlayhead(0);
@@ -60,15 +70,17 @@ void TimelinePanel::setEventTarget(wxWindowID eventTarget) {
 }
 
 void TimelinePanel::paintEvent(wxPaintEvent &WXUNUSED(event)) {
-	// depending on your system you may need to look at double-buffered dcs
 	wxPaintDC canvas(this);
 	render(canvas);
 }
 
 void TimelinePanel::paintNow() {
-	// depending on your system you may need to look at double-buffered dcs
 	wxClientDC canvas(this);
 	render(canvas);
+}
+
+void TimelinePanel::refreshNow(wxCommandEvent &WXUNUSED(event)) {
+	paintNow();
 }
 
 void TimelinePanel::onLeftDown(wxMouseEvent &event) {
@@ -82,34 +94,33 @@ void TimelinePanel::onLeftDown(wxMouseEvent &event) {
 	}
 	
 	if (!event.ControlDown()) {
-		selected_cells.clear();
-	}
-	
-	if (event.ShiftDown()) {
-		for (int x = ceil(std::min(btn.x, active_button.x)); x <= floor(std::max(btn.x, active_button.x)); x++) {
-			for (int y = ceil(std::min(btn.y, active_button.y)); y <= floor(std::max(btn.y, active_button.y)); y++) {
-				selected_cells.push_back(wxPoint(x, y));
+		for (auto s: activeProject->selection.sel) {
+			if (eventTarget) {
+				SelectionEvent fin_evt(SELECTION_OFF, eventTarget, *s);
+				fin_evt.SetEventObject(this);
+				wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
 			}
 		}
-	} else {
-		if (btn.x == floor(btn.x) && btn.y == floor(btn.y)) {
-			bool found = false;
-			auto iter = selected_cells.begin();
-			while (iter != selected_cells.end() && found == false) {
-				if ((*iter) == btn) found = true;
-				iter++;
-			}
-			if (found) selected_cells.erase(iter);
-			else selected_cells.push_back(btn);
-		}
+		activeProject->selection.clear();
 	}
+	if (btn.y >= visible_layers.size()) {
+		paintNow();
+		return;
+	}
+
+	SingleSelection *sel = activeProject->selection.add(visible_layers[btn.y], btn.x * ticksPerCol, (btn.x + 1) * ticksPerCol);
 	
-	active_button = btn;
+	// if controli s down check status of current clicked box
+	// send on/off event
+	
+	// otherwise, if this isnt a selected box already,
+	// send a deslect event for current selection,
+	// send event for new selection
 	
 	if (eventTarget) {
-		wxCommandEvent fin_evt(SELECTION_CHANGED, eventTarget);
+		SelectionEvent fin_evt(SELECTION_ON, eventTarget, *sel);
+		fin_evt.forceRefresh();
 		fin_evt.SetEventObject(this);
-//		fin_evt.SetInt(playhead / ticksPerCol);
 		wxPostEvent(wxWindow::FindWindowById(eventTarget), fin_evt);
 	}
 	
@@ -122,19 +133,6 @@ void TimelinePanel::onMouseMove(wxMouseEvent &event) {
 	wxPoint mousepos = event.GetLogicalPosition(wxClientDC(this));
 	wxPoint btn = mousepos_to_buttons(mousepos);
 	if (headerclicked) movePlayhead(btn.x * ticksPerCol);
-
-	/*wxRealPoint btn = buttonAtCoords(mousepos);
-	wxRealPoint first_btn = buttonAtCoords(clickpos);
-	
-	if (btn.x == first_btn.x && btn.y == first_btn.y) return;
-	
-	for (int x = ceil(std::min(btn.x, first_btn.x)); x <= floor(std::max(btn.x, first_btn.x)); x++) {
-		for (int y = ceil(std::min(btn.y, first_btn.y)); y <= floor(std::max(btn.y, first_btn.y)); y++) {
-			selected_buttons_box[x + (y * 10)] = true;
-		}
-	}*/
-	
-	//paintNow();
 }
 
 void TimelinePanel::onLeftUp(wxMouseEvent &WXUNUSED(event)) {
@@ -142,124 +140,26 @@ void TimelinePanel::onLeftUp(wxMouseEvent &WXUNUSED(event)) {
 }
 
 void TimelinePanel::render(wxDC &canvas) {
+	canvas.SetBrush(*wxWHITE_BRUSH);
+	canvas.SetPen(*wxTRANSPARENT_PEN);
+	canvas.DrawRectangle(wxPoint(0, 0), canvas.GetSize());
+	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+
 	int width = canvas.GetSize().GetX();
 	int xpos = labelsize-(GetVisibleBegin().GetCol()*colsize);
 	int ypos = headersize-(GetVisibleBegin().GetRow()*rowsize);
 	int cypos = ypos;
-	for (auto l: activeProject->layers) {
-		if (true /* l->isExpanded */) {
-			for (auto kf : l->keyframes) {
-				if (cypos >= headersize-rowsize) render_row(canvas, kf.first, kf.second, wxRect(0, cypos, width, rowsize));
-				cypos += rowsize;
-				if (cypos >= canvas.GetSize().GetY()) break;
-			}
-		}
+	for (auto kf: visible_layers) {
+		if (cypos >= headersize-rowsize) render_row(canvas, kf.second->name, kf.second, wxRect(0, cypos, width, rowsize));
+		cypos += rowsize;
+		if (cypos >= canvas.GetSize().GetY()) break;
 	}
-	
+	render_selection(canvas, activeProject->selection);
 	render_header(canvas);
 	render_playhead(canvas);
 	
 	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
 	
-	canvas.SetPen(wxPen(*wxWHITE, 2));
-	for (auto button : selected_cells) {
-		int left = button.x * colsize + xpos;
-		int top = button.y * rowsize + ypos;
-		if (left >= labelsize && top >= headersize) canvas.DrawRectangle(left, top, colsize, rowsize);
-	}
-	
-	canvas.SetPen(wxPen(*wxWHITE, 3));
-	int left = active_button.x * colsize + xpos;
-	int top = active_button.y * rowsize + ypos;
-	if (left >= labelsize && top >= headersize) canvas.DrawRectangle(left, top, colsize, rowsize);
-}
-
-void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box) {
-	int col1time = GetVisibleBegin().GetCol() * ticksPerCol;
-	int colNtime = GetVisibleEnd().GetCol() * ticksPerCol;
-	int lastCol = 0;
-	
-	canvas.SetPen(*wxBLACK_PEN);
-	canvas.DrawLine(bounding_box.GetLeft(), bounding_box.GetHeight(), bounding_box.GetRight(), bounding_box.GetHeight());
-	
-	for (auto iter: keyframes->keyframes) {
-		auto time = iter->time;
-		// XXX Need to check currently active keyframes, not just keyframes starting before first column time
-		//if (time < (col1time - activeProject->ticksPerBeat)) {
-			// starting_velocity = velocity;
-			// continue;
-		// }
-		// draw the box from 0 to iter->time with starting_velocity if it exists
-		double col = (time - col1time) / (ticksPerCol * 1.0);
-		if (col < 0.0) col = 0.0;
-		if (col > lastCol) lastCol = (int)(col);
-		int left = bounding_box.GetLeft()+labelsize+(col*colsize);
-
-		wxRect kfbox(bounding_box);
-		kfbox.SetLeft(left);
-		iter->render(canvas, kfbox);
-	}
-	
-	if (lastCol > GetColumnCount()) SetColumnCount(lastCol);
-	
-	canvas.SetPen(*wxBLACK_PEN);
-	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
-	
-	canvas.DrawText(rowname, bounding_box.GetTopLeft());
-	canvas.DrawLine(bounding_box.GetBottomLeft(), bounding_box.GetBottomRight());
-}
-
-void TimelinePanel::render_header_segment(wxDC &canvas, int col, int xpos) {
-	char buf[16];
-	int divsPerBeat = 4;
-	int measure = col / (colsPerBeat() * activeProject->beatsPerMeasure) + 1;
-	int beat = (int)(col / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
-	int div = (int)(col * divsPerBeat / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
-	int tick = (col * ticksPerCol) % (activeProject->ticksPerBeat / divsPerBeat) + 1;
-
-	if (beat == 1 && div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d", measure);
-	else if (div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
-	else if (tick == 1) snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
-	else snprintf(buf, sizeof(buf), "%d.%d.%d.%d", measure, beat, div, tick);
-	
-	canvas.DrawText(buf, xpos+4, 0);
-
-	if (beat == 1 && div == 1 && tick == 1) canvas.DrawLine(xpos, 0, xpos, headersize-2);
-	else if (div == 1 && tick == 1) canvas.DrawLine(xpos, headersize/2, xpos, headersize-2);
-	else if (tick == 1) canvas.DrawLine(xpos, headersize/4*3, xpos, headersize-2);
-	else canvas.DrawLine(xpos, headersize-6, xpos, headersize-2);
-}
-
-void TimelinePanel::render_header(wxDC &canvas) {
-	int width = canvas.GetSize().GetX();
-	int col = GetVisibleBegin().GetCol();
-	
-	canvas.SetPen(*wxTRANSPARENT_PEN);
-	canvas.SetBrush(*wxWHITE_BRUSH);
-	canvas.DrawRectangle(0, 0, width, headersize);
-	
-	canvas.SetPen(*wxBLACK_PEN);
-	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
-	
-	for (int x = labelsize; x < width; x += colsize) {
-		render_header_segment(canvas, col, x);
-		col++;
-	}
-	
-	canvas.SetPen(wxPen(*wxBLACK, 3));
-	canvas.DrawLine(0, headersize-2, width, headersize-2);
-}
-
-void TimelinePanel::render_playhead(wxDC &canvas) {
-	int xpos = playhead_in_pixels() - offset_in_pixels().x + labelsize;
-	
-	if (xpos >= labelsize) {
-		canvas.SetPen(wxPen(*wxBLACK, 6));
-		canvas.DrawLine(xpos, headersize, xpos, canvas.GetSize().GetHeight());
-		canvas.SetPen(wxPen(*wxWHITE, 3));
-		canvas.DrawLine(xpos, headersize, xpos, canvas.GetSize().GetHeight());
-		canvas.DrawCircle(xpos, headersize, 5.0);
-	}
 }
 
 void TimelinePanel::nextBeat() {
@@ -318,36 +218,111 @@ int TimelinePanel::getPlayhead() {
 	return playhead;
 }
 
-std::vector<wxPoint> TimelinePanel::getCurrentSelection() {
-	std::vector<wxPoint> current_selection;
-	for (auto cell : selected_cells) {
-		if (cell.x == playhead/ticksPerCol) current_selection.push_back(cell);
-	}
-	
-	return current_selection;
-}
-
-void TimelinePanel::setCurrentSelection(std::vector<wxPoint> selection) {
-	auto iter = selected_cells.begin();
-	while (iter != selected_cells.end()) {
-		if ((*iter).x == playhead/ticksPerCol) iter = selected_cells.erase(iter);
-		else iter++;
-	}
-	
-	for (auto iter : selection) {
-		wxPoint btn = iter;
-		btn.x = playhead/ticksPerCol;
-		selected_cells.push_back(btn);
-	}
-}
-
 wxCoord TimelinePanel::OnGetRowHeight(size_t row) const {
 	return rowsize;
 }
 
 wxCoord TimelinePanel::OnGetColumnWidth(size_t column) const {
 	return colsize;
-	//	return wxClientDC(this).GetSize().GetX();
+}
+
+void TimelinePanel::render_header(wxDC &canvas) {
+	int width = canvas.GetSize().GetX();
+	int col = GetVisibleBegin().GetCol();
+	
+	canvas.SetPen(*wxTRANSPARENT_PEN);
+	canvas.SetBrush(*wxWHITE_BRUSH);
+	canvas.DrawRectangle(0, 0, width, headersize);
+	
+	canvas.SetPen(*wxBLACK_PEN);
+	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+	
+	for (int x = labelsize; x < width; x += colsize) {
+		render_header_segment(canvas, col, x);
+		col++;
+	}
+	
+	canvas.SetPen(wxPen(*wxBLACK, 3));
+	canvas.DrawLine(0, headersize-2, width, headersize-2);
+}
+
+void TimelinePanel::render_header_segment(wxDC &canvas, int col, int xpos) {
+	char buf[16];
+	int divsPerBeat = 4;
+	int measure = col / (colsPerBeat() * activeProject->beatsPerMeasure) + 1;
+	int beat = (int)(col / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
+	int div = (int)(col * divsPerBeat / colsPerBeat()) % activeProject->beatsPerMeasure + 1;
+	int tick = (col * ticksPerCol) % (activeProject->ticksPerBeat / divsPerBeat) + 1;
+
+	// XXX This should be more efficient!
+	if (beat == 1 && div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d", measure);
+	else if (div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
+	else if (tick == 1) snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
+	else snprintf(buf, sizeof(buf), "%d.%d.%d.%d", measure, beat, div, tick);
+	
+	canvas.DrawText(buf, xpos+4, 0);
+
+	if (beat == 1 && div == 1 && tick == 1) canvas.DrawLine(xpos, 0, xpos, headersize-2);
+	else if (div == 1 && tick == 1) canvas.DrawLine(xpos, headersize/2, xpos, headersize-2);
+	else if (tick == 1) canvas.DrawLine(xpos, headersize/4*3, xpos, headersize-2);
+	else canvas.DrawLine(xpos, headersize-6, xpos, headersize-2);
+}
+
+void TimelinePanel::render_selection(wxDC &canvas, Selection sel) {
+	for (SingleSelection *s : sel.sel) {
+		if (s->set == NULL) return;
+		
+		canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+		canvas.SetPen(wxPen(*wxBLACK, 2));
+		
+		int i=0;
+		for (; i<visible_layers.size(); i++) {
+			if (visible_layers[i] == s->set) break;
+		}
+		
+		wxRect bounding_box = wxRect(index_to_screenpos(wxPoint(s->start/ticksPerCol, i)), index_to_screenpos(wxPoint(s->end/ticksPerCol, i+1)));
+		canvas.DrawRectangle(bounding_box);
+	}
+}
+
+void TimelinePanel::render_row(wxDC &canvas, std::string rowname, KeyframeSet *keyframes, wxRect bounding_box) {
+	int col1time = GetVisibleBegin().GetCol() * ticksPerCol;
+	int colNtime = GetVisibleEnd().GetCol() * ticksPerCol;
+	int lastCol = 0;
+	
+    Selection sel = activeProject->selection;
+
+	for (auto iter: keyframes->keyframes) {
+		auto time = iter->time;
+		double col = (time - col1time) / (ticksPerCol * 1.0);
+		if (col < 0.0) col = 0.0;
+		if (col > lastCol) lastCol = (int)(col);
+		int left = bounding_box.GetLeft()+labelsize+(col*colsize);
+
+		wxRect kfbox(bounding_box);
+		kfbox.SetLeft(left);
+		iter->render(canvas, kfbox);
+	}
+	
+	if (lastCol > GetColumnCount()) SetColumnCount(lastCol);
+	
+	canvas.SetPen(*wxBLACK_PEN);
+	canvas.SetBrush(*wxTRANSPARENT_BRUSH);
+	
+	canvas.DrawText(rowname, bounding_box.GetTopLeft());
+	canvas.DrawLine(bounding_box.GetBottomLeft(), bounding_box.GetBottomRight());
+}
+
+void TimelinePanel::render_playhead(wxDC &canvas) {
+	int xpos = playhead_in_pixels() - offset_in_pixels().x + labelsize;
+	
+	if (xpos >= labelsize) {
+		canvas.SetPen(wxPen(*wxBLACK, 6));
+		canvas.DrawLine(xpos, headersize, xpos, canvas.GetSize().GetHeight());
+		canvas.SetPen(wxPen(*wxWHITE, 3));
+		canvas.DrawLine(xpos, headersize, xpos, canvas.GetSize().GetHeight());
+		canvas.DrawCircle(xpos, headersize, 5.0);
+	}
 }
 
 double TimelinePanel::colsPerBeat() {
@@ -382,6 +357,13 @@ wxPoint TimelinePanel::mousepos_to_buttons(wxPoint mousepos) {
 	return wxPoint(
 		(mousepos.x + offset_in_pixels().x - labelsize)  / colsize,
 		(mousepos.y + offset_in_pixels().y - headersize) / rowsize
+	);
+}
+
+wxPoint TimelinePanel::index_to_screenpos(wxPoint index) {
+	return wxPoint(
+	   (index.x * colsize) - offset_in_pixels().x + labelsize,
+	   (index.y * rowsize) - offset_in_pixels().y + headersize
 	);
 }
 

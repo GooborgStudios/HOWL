@@ -12,7 +12,6 @@
 	#include <wx/wx.h>
 #endif
 
-#include <sys/time.h>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -23,8 +22,9 @@
 #include <cmath>
 #include <cassert>
 #include <utility>
+#include <iterator>
 
-#include "NightwaveCore/Helpers.h"
+#include "NightwaveCore/NightwaveCore.h"
 #include "Project.h"
 
 using namespace HOWL;
@@ -39,6 +39,14 @@ Keyframe::Keyframe(std::string name, long time) {
 	this->smoother = SMOOTH_LINEAR;
 }
 
+Keyframe::~Keyframe() {
+
+}
+
+bool Keyframe::operator==(Keyframe &a) {
+	return false;
+}
+
 std::string Keyframe::serialize() {
 	return "";
 }
@@ -49,7 +57,9 @@ void Keyframe::toBuffer(char *outbuf, int len) {
 }
 
 void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
-	
+	canvas.SetBrush(*wxBLUE_BRUSH);
+	canvas.SetPen(*wxTRANSPARENT_PEN);
+	canvas.DrawRectangle(bounding_box.GetLeft()-(bounding_box.GetHeight()/2), bounding_box.GetTop(), bounding_box.GetHeight(), bounding_box.GetHeight());
 }
 
 DoubleKeyframe::DoubleKeyframe(std::string name, long time, double value) : Keyframe(name, time) {
@@ -80,37 +90,42 @@ StringKeyframe::StringKeyframe(std::string name, long time, const char *value) :
 	this->smoother = SMOOTH_HOLD;
 };
 
+StringKeyframe::~StringKeyframe() {
+	delete value;
+}
+
 std::string StringKeyframe::serialize() {
 	return *value;
 }
 
-KeyframeSet::KeyframeSet(Layer *parent) {
+KeyframeSet::KeyframeSet(std::string name, Layer *parent) {
+	this->name = name;
 	this->parent = parent;
 	this->currentTime = -1;
 	this->prevKF = keyframes.end();
 	this->nextKF = keyframes.end();
 }
 
-void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
+void KeyframeSet::AddKeyframe(Keyframe *keyframe, bool do_replace) {
+	// If do_replace is true, then replace any keyframes that are already at the specified time, otherwise ignore the new keyframe
 	auto iters = getSurroundingKeyframes(keyframe->time);
 
-	if (iters.second == keyframes.end()) {
+	if (iters.first == keyframes.end()) {
 		keyframes.push_back(keyframe);
-	} else {
-		if (keyframe->time == (*iters.first)->time) {
+	} else if (keyframe->time == (*iters.first)->time) {
+		if (do_replace) {
 			Keyframe *oldKF = *iters.first;
 			*iters.first = keyframe;
 			delete oldKF;
-		} else {
-			int kftime = (*nextKF)->time;
-			int oldcapacity = keyframes.capacity();
-			keyframes.insert(iters.first, keyframe);
-			if (kftime >= keyframe->time || oldcapacity != keyframes.capacity()) seek(keyframe->time);
 		}
+	} else if (iters.second == keyframes.end()) {
+		keyframes.push_back(keyframe);
+	} else {
+		keyframes.insert(std::next(iters.first), keyframe);
 	}
-	
+
 	seek(keyframe->time);
-	
+
 	if (prevKF == keyframes.end() || (keyframe->time < currentTime && currentTime - keyframe->time < currentTime - (*prevKF)->time)) {
 		prevKF = iters.first;
 	} else if (nextKF == keyframes.end() || (keyframe->time > currentTime && keyframe->time - currentTime < (*nextKF)->time - currentTime)) {
@@ -118,45 +133,45 @@ void KeyframeSet::AddKeyframe(Keyframe *keyframe) {
 	}
 }
 
-std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
-	int before = 0, after = keyframes.size();
-	int i;
-	
-	if (currentTime == time || after == 0) return std::pair<KeyframeIterator, KeyframeIterator>(prevKF, nextKF);
-	
-	while (after - before > 1) {
-		i = before + (after-before) / 2;
-		if (keyframes[i]->time > time) after = i+1;
-		else if (i+1 >= after) break;
-		else if (keyframes[i+1]->time <= time) before = i;
-		else if (keyframes[i]->time <= time) break;
-	}
-	
-	return std::pair<KeyframeIterator, KeyframeIterator>(keyframes.begin()+before, keyframes.begin()+after);
+void KeyframeSet::removeKeyframes(KeyframePair keyframepair) {
+	std::pair<KeyframeIterator, KeyframeIterator> pair1, pair2;
+	pair1 = getSurroundingKeyframes(keyframepair.first->time);
+	pair2 = getSurroundingKeyframes(keyframepair.second->time);
 
+	while ((*pair1.first)->time < keyframepair.first->time) {
+		pair1.first++;
+	}
+
+	keyframes.erase(pair1.first, pair2.second);
+}
+void KeyframeSet::removeKeyframes(Keyframe *first, Keyframe *second) {
+	KeyframePair pair;
+	pair.first = first;
+	pair.second = second;
+	removeKeyframes(pair);
 }
 
 #define USE_STUPID_SEEK
 
 #ifdef USE_STUPID_SEEK
-void KeyframeSet::seek(long newTime) {
-	currentTime = 0;
-	prevKF = keyframes.begin();
-	if (prevKF != keyframes.end()) {
-		nextKF = std::next(prevKF, 1);
-	} else {
-		nextKF = keyframes.end();
+	void KeyframeSet::seek(long newTime) {
+		currentTime = 0;
+		prevKF = keyframes.begin();
+		if (prevKF != keyframes.end()) {
+			nextKF = std::next(prevKF, 1);
+		} else {
+			nextKF = keyframes.end();
+		}
+		advanceFrame(newTime);
 	}
-	advanceFrame(newTime);
-}
 #else
-void KeyframeSet::seek(long newTime) {
-	std::pair<KeyframeIterator,KeyframeIterator> iters = getSurroundingKeyframes(newTime);
+	void KeyframeSet::seek(long newTime) {
+		std::pair<KeyframeIterator,KeyframeIterator> iters = getSurroundingKeyframes(newTime);
 
-	prevKF = iters.first;
-	nextKF = iters.second;
-	currentTime = newTime;
-}
+		prevKF = iters.first;
+		nextKF = iters.second;
+		currentTime = newTime;
+	}
 #endif
 
 bool KeyframeSet::advanceFrame(long increment) {
@@ -185,14 +200,26 @@ double KeyframeSet::smoother_fraction() {
 	return (currentTime - (*prevKF)->time) / dur;
 }
 
-Keyframe *KeyframeSet::getFirst() {
-	if (prevKF == keyframes.end()) return NULL;
-	return *prevKF;
-}
+std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
+	int before = 0, after = keyframes.size();
+	int i;
 
-Keyframe *KeyframeSet::getSecond() {
-	if (nextKF == keyframes.end()) return NULL;
-	return *nextKF;
+	// we've already found them, or there are no keyframes
+	if (currentTime == time || after == 0) return std::pair<KeyframeIterator, KeyframeIterator>(prevKF, nextKF);
+	
+	while (after - before > 1) {
+		i = before + (after-before) / 2;
+		if (keyframes[i]->time > time) after = i;
+		else if (i+1 >= after) before = after - 1;
+		else if (keyframes[i+1]->time <= time) before = i;
+		else if (keyframes[i]->time <= time) {
+			before = i;
+			after = i+1;
+		};
+	}
+	
+	return std::pair<KeyframeIterator, KeyframeIterator>(keyframes.begin()+before, keyframes.begin()+after);
+
 }
 
 Layer::Layer() {
@@ -203,20 +230,68 @@ Layer::Layer(std::string description) {
 	this->description = description;
 }
 
-void Layer::AddKeyframe(Keyframe *keyframe) {
-	std::string type = keyframe->name;
-	if (keyframes.find(type) == keyframes.end()) keyframes[type] = new KeyframeSet(this);
-	keyframes[type]->AddKeyframe(keyframe);
+std::vector<std::string> Layer::getSetNames() {
+	std::vector<std::string> names;
+	for (KeyframeSet *set : keyframes) names.push_back(set->name);
+	return names;
 }
 
+KeyframeSet *Layer::findSet(std::string name) {
+	for (auto kf: keyframes) {
+		if (kf->name == name) return kf;
+	}
+	return NULL;
+}
+
+KeyframePair Layer::getSurroundingKeyframes(std::string name) {
+	KeyframePair value;
+	KeyframeSet *set = findSet(name);
+	if (set == NULL) return KeyframePair(NULL, NULL);
+
+	value.first = set->prevKF == set->keyframes.end() ? NULL : (*set->prevKF);
+	value.second = set->nextKF == set->keyframes.end() ? NULL : (*set->nextKF);
+
+	return value;
+}
+
+KeyframePair Layer::getSurroundingKeyframes(std::string name, long time) {
+	KeyframePair value;
+
+	KeyframeSet *set = findSet(name);
+	if (set == NULL) return KeyframePair(NULL, NULL);
+
+	std::pair<KeyframeIterator, KeyframeIterator> kf = set->getSurroundingKeyframes(time);
+	value.first = kf.first == set->keyframes.end() ? NULL : (*kf.first);
+	value.second = kf.second == set->keyframes.end() ? NULL : (*kf.second);
+
+	return value;
+}
+
+void Layer::AddKeyframe(Keyframe *keyframe) {
+	KeyframeSet *found = findSet(keyframe->name);
+	if (!found) {
+		found = new KeyframeSet(keyframe->name, this);
+		keyframes.push_back(found);
+	}
+	found->AddKeyframe(keyframe);
+}
+
+void Layer::removeKeyframes(KeyframePair keyframepair) {
+	KeyframeSet *set = findSet(keyframepair.first->name);
+	assert(set);
+	set->removeKeyframes(keyframepair);
+}
+
+
+
 void Layer::seek(long newTime) {
-	for (auto iter : keyframes) iter.second->seek(newTime);
+	for (auto iter : keyframes) iter->seek(newTime);
 }
 
 bool Layer::advanceFrame(long increment) {
 	bool eof = true;
 	for (auto iter : keyframes) {
-		if (iter.second->advanceFrame(increment) == false) eof = false;
+		if (iter->advanceFrame(increment) == false) eof = false;
 	}
 	return eof;
 }
@@ -224,25 +299,28 @@ bool Layer::advanceFrame(long increment) {
 bool Layer::eof() {
 	bool eof = true;
 	for (auto iter : keyframes) {
-		if (iter.second->eof() == false) eof = false;
+		if (iter->eof() == false) eof = false;
 	}
 	return eof;
 }
 
-double Layer::getDouble(std::string type) {
-	KeyframeSet *set = keyframes[type];
-	DoubleKeyframe *KF1 = (DoubleKeyframe *)(set->getFirst());
-	DoubleKeyframe *KF2 = (DoubleKeyframe *)(set->getSecond());
-	
-	if (KF1 == NULL) return 0.0;
-	if (KF2 == NULL) return KF1->value;
+double Layer::getDouble(std::string name) {
+	KeyframeSet *set = findSet(name);
+	KeyframePair value = getSurroundingKeyframes(name);
+
+	if (!value.first) return 0.0;
+	if (!value.second) return ((DoubleKeyframe *)(value.first))->value;
 	double pos = set->smoother_fraction();
-	return KF1->value - (KF1->value * pos) + (KF2->value * pos); // XXX Simplify me (to get a good grade)!
+
+	return (((DoubleKeyframe *)(value.first))->value * (1 - pos))
+		+ (((DoubleKeyframe *)(value.second))->value * pos);
 }
 
-std::string *Layer::getString(std::string type) {
-	if (keyframes[type]->getFirst() == NULL) return new std::string("");
-	return ((StringKeyframe *)(keyframes[type]->getFirst()))->value;
+
+std::string *Layer::getString(std::string name) {
+	KeyframePair value = getSurroundingKeyframes(name);
+	if (!value.first) return new std::string("");
+	return ((StringKeyframe *)(value.first))->value;
 }
 
 bool is_sooner(Keyframe *a, Keyframe *b) {
