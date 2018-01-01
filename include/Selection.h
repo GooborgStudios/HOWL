@@ -34,7 +34,7 @@ namespace HOWL {
 		public:
 			SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection);
 			void forceRefresh();
-			void doRefresh();
+			bool doRefresh();
 			void SetSelection(SingleSelection selection);
 			SingleSelection GetSelection() const;
 			wxEvent* Clone() const;

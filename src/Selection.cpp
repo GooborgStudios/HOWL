@@ -63,7 +63,7 @@ void SelectionEvent::forceRefresh() {
 	should_refresh = true;
 }
 
-void SelectionEvent::doRefresh() {
+bool SelectionEvent::doRefresh() {
 	return should_refresh;
 }
 
