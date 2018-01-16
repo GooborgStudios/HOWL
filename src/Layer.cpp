@@ -197,7 +197,19 @@ double KeyframeSet::smoother_fraction() {
 	
 	double dur = (*nextKF)->time - (*prevKF)->time;
 	if (dur == 0) return 0.0; // Avoid divide-by-zero crash
-	return (currentTime - (*prevKF)->time) / dur;
+	switch ((*prevKF)->smoother) {
+		case SMOOTH_HOLD:
+			return 0.0;
+			break;
+		case SMOOTH_LINEAR:
+			return (currentTime - (*prevKF)->time) / dur;
+			break;
+		case SMOOTH_BEZIER:
+			break;
+		case SMOOTH_CONT_BEZIER:
+			break;
+	}
+	return (currentTime - (*prevKF)->time) / dur; // XXX Remove me soon!
 }
 
 std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
