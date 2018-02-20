@@ -7,6 +7,13 @@
 
 #pragma once
 
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
+#endif
+
 #include <vector>
 
 #include "Layer.h"
@@ -29,23 +36,25 @@ namespace HOWL {
 
 			std::vector<SingleSelection *> sel;
 	};
-	
-	class SelectionEvent : public wxEvent {
-		public:
-			SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection);
-			void forceRefresh();
-			bool doRefresh();
-			void SetSelection(SingleSelection selection);
-			SingleSelection GetSelection() const;
-			wxEvent* Clone() const;
+
+	#ifdef USE_WXWIDGETS
+		class SelectionEvent : public wxEvent {
+			public:
+				SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection);
+				void forceRefresh();
+				bool doRefresh();
+				void SetSelection(SingleSelection selection);
+				SingleSelection GetSelection() const;
+				wxEvent* Clone() const;
+			
+			private:
+				bool should_refresh = false;
+				SingleSelection m_selection;
+		};
 		
-		private:
-			bool should_refresh = false;
-			SingleSelection m_selection;
-	};
-	
-	wxDECLARE_EVENT(SELECTION_ON, SelectionEvent);
-	wxDECLARE_EVENT(SELECTION_OFF, SelectionEvent);
+		wxDECLARE_EVENT(SELECTION_ON, SelectionEvent);
+		wxDECLARE_EVENT(SELECTION_OFF, SelectionEvent);
+	#endif
 };
 
 #define SelectionEventHandler(func) (&func)

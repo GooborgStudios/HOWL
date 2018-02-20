@@ -12,9 +12,11 @@
 
 #pragma once
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-	#include <wx/wx.h>
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
 #endif
 
 #include <vector>
@@ -63,6 +65,8 @@ namespace HOWL {
 			std::string filePath = "";
 	};
 
-	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
-	wxDECLARE_EVENT(PROJECT_LOADED, wxCommandEvent);
+	#ifdef USE_WXWIDGETS
+		wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
+		wxDECLARE_EVENT(PROJECT_LOADED, wxCommandEvent);
+	#endif
 }

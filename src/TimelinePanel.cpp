@@ -5,6 +5,8 @@
 // https://www.nightwave.co
 //
 
+#ifdef USE_WXWIDGETS // Entire file requires wxWidgets
+
 #include "TimelinePanel.h"
 
 #include <wx/wxprec.h>
@@ -377,3 +379,5 @@ wxEND_EVENT_TABLE()
 //click to create/move/recolor notes
 //snap to grid
 //zooming
+
+#endif

@@ -7,9 +7,11 @@
 
 #include "Layer.h"
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-	#include <wx/wx.h>
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
 #endif
 
 #include <string>
@@ -56,11 +58,13 @@ void Keyframe::toBuffer(char *outbuf, int len) {
 	snprintf(outbuf, len, "");
 }
 
-void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
-	canvas.SetBrush(*wxBLUE_BRUSH);
-	canvas.SetPen(*wxTRANSPARENT_PEN);
-	canvas.DrawRectangle(bounding_box.GetLeft()-(bounding_box.GetHeight()/2), bounding_box.GetTop(), bounding_box.GetHeight(), bounding_box.GetHeight());
-}
+#ifdef USE_WXWIDGETS
+	void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
+		canvas.SetBrush(*wxBLUE_BRUSH);
+		canvas.SetPen(*wxTRANSPARENT_PEN);
+		canvas.DrawRectangle(bounding_box.GetLeft()-(bounding_box.GetHeight()/2), bounding_box.GetTop(), bounding_box.GetHeight(), bounding_box.GetHeight());
+	}
+#endif
 
 DoubleKeyframe::DoubleKeyframe(std::string name, long time, double value) : Keyframe(name, time) {
 	this->value = value;

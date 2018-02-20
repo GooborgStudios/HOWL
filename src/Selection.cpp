@@ -7,14 +7,23 @@
 
 #include "Selection.h"
 
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
+#endif
+
 #include <vector>
 
 #include "Layer.h"
 
 using namespace HOWL;
 
-wxDEFINE_EVENT(HOWL::SELECTION_ON, HOWL::SelectionEvent);
-wxDEFINE_EVENT(HOWL::SELECTION_OFF, HOWL::SelectionEvent);
+#ifdef USE_WXWIDGETS
+	wxDEFINE_EVENT(HOWL::SELECTION_ON, HOWL::SelectionEvent);
+	wxDEFINE_EVENT(HOWL::SELECTION_OFF, HOWL::SelectionEvent);
+#endif
 
 // XXX Rename me to SelectionSet!
 Selection::Selection() {
@@ -55,8 +64,9 @@ bool Selection::matches(Keyframe *kf) {
 	return false;
 }
 
+#ifdef USE_WXWIDGETS
 SelectionEvent::SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection) : wxEvent(winid, eventType), m_selection(selection) {
-	
+
 };
 
 void SelectionEvent::forceRefresh() {
@@ -78,4 +88,5 @@ SingleSelection SelectionEvent::GetSelection() const {
 wxEvent* SelectionEvent::Clone() const {
 	return new SelectionEvent(*this);
 }
+#endif
 

@@ -41,11 +41,6 @@ add_library(HOWL SHARED
 	${SRC}/Selection.cpp ${INCL}/Selection.h
 )
 
-set(CMAKE_CXX_COMPILER g++)
-find_package(wxWidgets COMPONENTS html qa adv core xml net base REQUIRED)
-execute_process(COMMAND "wx-config --cxxflags" OUTPUT_VARIABLE wxConfig_CXX_FLAGS)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${wxConfig_CXX_FLAGS}")
-
 IF(APPLE)
 	add_definitions(-DOSX_BUNDLE)
 	target_link_libraries(HOWL "-framework CoreFoundation")
@@ -54,8 +49,14 @@ ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_definitions(-D__NO_INLINE__)
 ENDIF()
 
-include(${wxWidgets_USE_FILE})
-target_link_libraries(HOWL ${wxWidgets_LIBRARIES})
+find_package(wxWidgets COMPONENTS html qa adv core xml net base)
+IF(wxWidgets_FOUND)
+	add_definitions(-DUSE_WXWIDGETS)
+	execute_process(COMMAND "wx-config --cxxflags" OUTPUT_VARIABLE wxConfig_CXX_FLAGS)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${wxConfig_CXX_FLAGS}")
+	include(${wxWidgets_USE_FILE})
+	target_link_libraries(HOWL ${wxWidgets_LIBRARIES})
+ENDIF(wxWidgets_FOUND)
 
 find_package(NightwaveCore REQUIRED)
 include_directories(${NightwaveCore_INCLUDE_DIR})

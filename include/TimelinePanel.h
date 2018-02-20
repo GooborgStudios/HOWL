@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifdef USE_WXWIDGETS // Entire file requires wxWidgets
+
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
 	#include <wx/wx.h>
@@ -82,3 +84,5 @@ namespace HOWL {
 	wxDECLARE_EVENT(PLAYHEAD_MOVED, wxCommandEvent);
 	wxDECLARE_EVENT(SELECTION_CHANGED, wxCommandEvent);
 }
+
+#endif

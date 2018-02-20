@@ -7,9 +7,11 @@
 
 #pragma once
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-	#include <wx/wx.h>
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
 #endif
 
 #include <string>
@@ -39,7 +41,10 @@ namespace HOWL {
 			virtual ~Keyframe();
 			virtual std::string serialize();
 			void toBuffer(char *outbuf, int len);
-			virtual void render(wxDC &canvas, wxRect bounding_box);
+
+			#ifdef USE_WXWIDGETS
+				virtual void render(wxDC &canvas, wxRect bounding_box);
+			#endif
 
 			virtual bool operator==(Keyframe &a);
 
