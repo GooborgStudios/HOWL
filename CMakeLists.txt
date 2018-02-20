@@ -7,6 +7,8 @@ if(UNIX AND NOT APPLE)
 	set(LINUX TRUE)
 endif()
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10" CACHE STRING "Minimum macOS deployment version")
+
 # Project properties
 project(HOWL)
 set(TARGET_VERSION_MAJOR 0)
@@ -45,9 +47,6 @@ execute_process(COMMAND "wx-config --cxxflags" OUTPUT_VARIABLE wxConfig_CXX_FLAG
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${wxConfig_CXX_FLAGS}")
 
 IF(APPLE)
-	IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.12")
-	ENDIF()
 	add_definitions(-DOSX_BUNDLE)
 	target_link_libraries(HOWL "-framework CoreFoundation")
 	set_target_properties(HOWL PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER co.nightwave.howl)
