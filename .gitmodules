@@ -1,3 +1,6 @@
 [submodule "submodules/GooCore"]
 	path = submodules/GooCore
 	url = https://github.com/GooborgStudios/GooCore.git
+[submodule "doxytheme"]
+	path = doxytheme
+	url = https://github.com/GooborgStudios/gooborg-doxygen-theme.git
