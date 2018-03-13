@@ -1,4 +1,4 @@
-# HOWL - Nightwave Studios
+# HOWL - Gooborg Studios
 
 # Minimum version required for CMake
 cmake_minimum_required(VERSION 3.1)
@@ -14,7 +14,7 @@ project(HOWL)
 set(TARGET_VERSION_MAJOR 0)
 set(TARGET_VERSION_MINOR 1)
 set(TARGET_VERSION_PATCH 0)
-set(TARGET_COPYRIGHT "©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.")
+set(TARGET_COPYRIGHT "©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.")
 
 set(CMAKE_BINARY_DIR ${PROJECT_BINARY_DIR})
 set(PROJECT_SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
@@ -58,9 +58,9 @@ IF(wxWidgets_FOUND)
 	target_link_libraries(HOWL ${wxWidgets_LIBRARIES})
 ENDIF(wxWidgets_FOUND)
 
-find_package(NightwaveCore REQUIRED)
-include_directories(${NightwaveCore_INCLUDE_DIR})
-target_link_libraries(HOWL ${NightwaveCore_LIBRARIES})
+find_package(GooCore REQUIRED)
+include_directories(${GooCore_INCLUDE_DIR})
+target_link_libraries(HOWL ${GooCore_LIBRARIES})
 
 find_package(Doxygen)
 IF(DOXYGEN_FOUND)

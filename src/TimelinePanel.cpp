@@ -1,8 +1,8 @@
 //
 // HOWL - Music-synced animation library
 // File: TimelinePanel.cpp
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 #ifdef USE_WXWIDGETS // Entire file requires wxWidgets

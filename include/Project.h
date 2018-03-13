@@ -1,8 +1,8 @@
 //
 // HOWL - Music-synced animation library
 // File: Project.h
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 /**
@@ -22,7 +22,7 @@
 #include <vector>
 #include <string>
 
-#include "NightwaveCore/NightwaveCore.h"
+#include "GooCore/GooCore.h"
 #include "Layer.h"
 #include "Selection.h"
 

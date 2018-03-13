@@ -1,8 +1,8 @@
 //
 // HOWL - Music-synced animation library
 // File: Layer.cpp
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 #include "Layer.h"
@@ -26,7 +26,7 @@
 #include <utility>
 #include <iterator>
 
-#include "NightwaveCore/NightwaveCore.h"
+#include "GooCore/GooCore.h"
 #include "Project.h"
 
 using namespace HOWL;
