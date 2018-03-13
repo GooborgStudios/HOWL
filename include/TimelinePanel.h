@@ -1,11 +1,13 @@
 //
 // HOWL - Music-synced animation library
 // File: TimelinePanel.h
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 #pragma once
+
+#ifdef USE_WXWIDGETS // Entire file requires wxWidgets
 
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
@@ -15,7 +17,7 @@
 #include <wx/dcbuffer.h>
 #include <wx/vscroll.h>
 
-#include "NightwaveCore/NightwaveCore.h"
+#include "GooCore/GooCore.h"
 #include "Project.h"
 #include "Layer.h"
 
@@ -82,3 +84,5 @@ namespace HOWL {
 	wxDECLARE_EVENT(PLAYHEAD_MOVED, wxCommandEvent);
 	wxDECLARE_EVENT(SELECTION_CHANGED, wxCommandEvent);
 }
+
+#endif

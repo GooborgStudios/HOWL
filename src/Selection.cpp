@@ -1,11 +1,18 @@
 //
 // HOWL - Music-synced animation library
 // File: Selection.cpp
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 #include "Selection.h"
+
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
+#endif
 
 #include <vector>
 
@@ -13,8 +20,10 @@
 
 using namespace HOWL;
 
-wxDEFINE_EVENT(HOWL::SELECTION_ON, HOWL::SelectionEvent);
-wxDEFINE_EVENT(HOWL::SELECTION_OFF, HOWL::SelectionEvent);
+#ifdef USE_WXWIDGETS
+	wxDEFINE_EVENT(HOWL::SELECTION_ON, HOWL::SelectionEvent);
+	wxDEFINE_EVENT(HOWL::SELECTION_OFF, HOWL::SelectionEvent);
+#endif
 
 // XXX Rename me to SelectionSet!
 Selection::Selection() {
@@ -55,8 +64,9 @@ bool Selection::matches(Keyframe *kf) {
 	return false;
 }
 
+#ifdef USE_WXWIDGETS
 SelectionEvent::SelectionEvent(wxEventType eventType, wxWindowID winid, SingleSelection selection) : wxEvent(winid, eventType), m_selection(selection) {
-	
+
 };
 
 void SelectionEvent::forceRefresh() {
@@ -78,4 +88,5 @@ SingleSelection SelectionEvent::GetSelection() const {
 wxEvent* SelectionEvent::Clone() const {
 	return new SelectionEvent(*this);
 }
+#endif
 

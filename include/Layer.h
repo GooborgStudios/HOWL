@@ -1,15 +1,17 @@
 //
 // HOWL - Music-synced animation library
 // File: Layer.h
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 #pragma once
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-	#include <wx/wx.h>
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
 #endif
 
 #include <string>
@@ -18,7 +20,7 @@
 #include <map>
 #include <utility>
 
-#include "NightwaveCore/NightwaveCore.h"
+#include "GooCore/GooCore.h"
 
 #define PLAYBACK_DEBUG 0
 
@@ -39,7 +41,10 @@ namespace HOWL {
 			virtual ~Keyframe();
 			virtual std::string serialize();
 			void toBuffer(char *outbuf, int len);
-			virtual void render(wxDC &canvas, wxRect bounding_box);
+
+			#ifdef USE_WXWIDGETS
+				virtual void render(wxDC &canvas, wxRect bounding_box);
+			#endif
 
 			virtual bool operator==(Keyframe &a);
 

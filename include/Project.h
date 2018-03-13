@@ -1,8 +1,8 @@
 //
 // HOWL - Music-synced animation library
 // File: Project.h
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 /**
@@ -12,15 +12,17 @@
 
 #pragma once
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-	#include <wx/wx.h>
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
 #endif
 
 #include <vector>
 #include <string>
 
-#include "NightwaveCore/NightwaveCore.h"
+#include "GooCore/GooCore.h"
 #include "Layer.h"
 #include "Selection.h"
 
@@ -63,6 +65,8 @@ namespace HOWL {
 			std::string filePath = "";
 	};
 
-	wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
-	wxDECLARE_EVENT(PROJECT_LOADED, wxCommandEvent);
+	#ifdef USE_WXWIDGETS
+		wxDECLARE_EVENT(PROJECT_SAVED, wxCommandEvent);
+		wxDECLARE_EVENT(PROJECT_LOADED, wxCommandEvent);
+	#endif
 }

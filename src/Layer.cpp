@@ -1,15 +1,17 @@
 //
 // HOWL - Music-synced animation library
 // File: Layer.cpp
-// ©2017 Nightwave Studios: Vinyl Darkscratch, Light Apacha.
-// https://www.nightwave.co
+// ©2018 Gooborg Studios: Vinyl Darkscratch, Light Apacha.
+// http://www.gooborg.com
 //
 
 #include "Layer.h"
 
-#include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-	#include <wx/wx.h>
+#ifdef USE_WXWIDGETS
+	#include <wx/wxprec.h>
+	#ifndef WX_PRECOMP
+		#include <wx/wx.h>
+	#endif
 #endif
 
 #include <string>
@@ -24,7 +26,7 @@
 #include <utility>
 #include <iterator>
 
-#include "NightwaveCore/NightwaveCore.h"
+#include "GooCore/GooCore.h"
 #include "Project.h"
 
 using namespace HOWL;
@@ -56,11 +58,13 @@ void Keyframe::toBuffer(char *outbuf, int len) {
 	snprintf(outbuf, len, "");
 }
 
-void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
-	canvas.SetBrush(*wxBLUE_BRUSH);
-	canvas.SetPen(*wxTRANSPARENT_PEN);
-	canvas.DrawRectangle(bounding_box.GetLeft()-(bounding_box.GetHeight()/2), bounding_box.GetTop(), bounding_box.GetHeight(), bounding_box.GetHeight());
-}
+#ifdef USE_WXWIDGETS
+	void Keyframe::render(wxDC &canvas, wxRect bounding_box) {
+		canvas.SetBrush(*wxBLUE_BRUSH);
+		canvas.SetPen(*wxTRANSPARENT_PEN);
+		canvas.DrawRectangle(bounding_box.GetLeft()-(bounding_box.GetHeight()/2), bounding_box.GetTop(), bounding_box.GetHeight(), bounding_box.GetHeight());
+	}
+#endif
 
 DoubleKeyframe::DoubleKeyframe(std::string name, long time, double value) : Keyframe(name, time) {
 	this->value = value;
@@ -197,7 +201,19 @@ double KeyframeSet::smoother_fraction() {
 	
 	double dur = (*nextKF)->time - (*prevKF)->time;
 	if (dur == 0) return 0.0; // Avoid divide-by-zero crash
-	return (currentTime - (*prevKF)->time) / dur;
+	switch ((*prevKF)->smoother) {
+		case SMOOTH_HOLD:
+			return 0.0;
+			break;
+		case SMOOTH_LINEAR:
+			return (currentTime - (*prevKF)->time) / dur;
+			break;
+		case SMOOTH_BEZIER:
+			break;
+		case SMOOTH_CONT_BEZIER:
+			break;
+	}
+	return (currentTime - (*prevKF)->time) / dur; // XXX Remove me soon!
 }
 
 std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {
