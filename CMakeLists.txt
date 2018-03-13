@@ -44,7 +44,7 @@ add_library(HOWL SHARED
 IF(APPLE)
 	add_definitions(-DOSX_BUNDLE)
 	target_link_libraries(HOWL "-framework CoreFoundation")
-	set_target_properties(HOWL PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER co.nightwave.howl)
+	set_target_properties(HOWL PROPERTIES MACOSX_FRAMEWORK_IDENTIFIER com.gooborg.howl)
 ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	add_definitions(-D__NO_INLINE__)
 ENDIF()
