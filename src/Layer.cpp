@@ -38,7 +38,12 @@ Keyframe::Keyframe() {
 Keyframe::Keyframe(std::string name, long time) {
 	this->name = name;
 	this->time = time;
-	this->smoother = SMOOTH_LINEAR;
+
+	// set up smoother for linear by default;
+	this->smootherBefore[0] = this->smootherAfter[0] = time;
+	this->smootherBefore[1] = 1;
+	this->smootherAfter[1] = 0;
+	this->smootherHold = false;
 }
 
 Keyframe::~Keyframe() {
@@ -86,12 +91,12 @@ std::string DoubleKeyframe::serialize() {
 
 StringKeyframe::StringKeyframe(std::string name, long time, std::string *value) : Keyframe(name, time) {
 	this->value = value;
-	this->smoother = SMOOTH_HOLD;
+	this->smootherHold = true;
 };
 
 StringKeyframe::StringKeyframe(std::string name, long time, const char *value) : Keyframe(name, time) {
 	this->value = new std::string(value);
-	this->smoother = SMOOTH_HOLD;
+	this->smootherHold = true;
 };
 
 StringKeyframe::~StringKeyframe() {
@@ -193,7 +198,6 @@ bool KeyframeSet::eof() {
 }
 
 double KeyframeSet::smoother_fraction() {
-	// XXX Only does Linear smoothing, add other smoother types
 	if (nextKF == keyframes.end()) return 0.0;
 	
 	assert(currentTime >= (*prevKF)->time);
@@ -201,19 +205,32 @@ double KeyframeSet::smoother_fraction() {
 	
 	double dur = (*nextKF)->time - (*prevKF)->time;
 	if (dur == 0) return 0.0; // Avoid divide-by-zero crash
-	switch ((*prevKF)->smoother) {
-		case SMOOTH_HOLD:
-			return 0.0;
-			break;
-		case SMOOTH_LINEAR:
-			return (currentTime - (*prevKF)->time) / dur;
-			break;
-		case SMOOTH_BEZIER:
-			break;
-		case SMOOTH_CONT_BEZIER:
-			break;
-	}
-	return (currentTime - (*prevKF)->time) / dur; // XXX Remove me soon!
+	if ((*prevKF)->smootherHold) return 0.0;
+
+	// Create a cubic spline with 4 control points in 2D using
+	// a clamped knot vector. This call is equivalent to:
+	// tinyspline::BSpline spline(4, 2, 3, TS_CLAMPED);
+	tinyspline::BSpline spline(4);
+
+	// Setup control points.
+	std::vector<tinyspline::real> ctrlp = spline.ctrlp();
+
+	// Stores our evaluation results.
+	std::vector<tinyspline::real> result;
+
+	ctrlp[0] = (*prevKF)->time; // x0
+	ctrlp[1] = 0.0;  // y0
+	ctrlp[2] = (*prevKF)->smootherAfter[0];  // x1
+	ctrlp[3] = (*prevKF)->smootherAfter[1];  // y1
+	ctrlp[4] = (*nextKF)->smootherBefore[0];  // x2
+	ctrlp[5] = (*nextKF)->smootherBefore[1];  // y2
+	ctrlp[6] = (*nextKF)->time; // x3
+	ctrlp[7] = 1.0;  // y3
+	spline.setCtrlp(ctrlp);
+
+	result = spline.evaluate(((double)(currentTime-((*prevKF)->time))) / ((*nextKF)->time-(*prevKF)->time)).result();
+	return result[1];
+//	return (currentTime - (*prevKF)->time) / dur; // XXX Convert to handle Bezier!
 }
 
 std::pair<KeyframeIterator, KeyframeIterator> KeyframeSet::getSurroundingKeyframes(long time) {

@@ -62,6 +62,12 @@ find_package(GooCore REQUIRED)
 include_directories(${GooCore_INCLUDE_DIR})
 target_link_libraries(HOWL ${GooCore_LIBRARIES})
 
+find_package(TinySpline REQUIRED)
+include_directories(${TinySpline_INCLUDE_DIR})
+include_directories(${TinySpline++_INCLUDE_DIR})
+target_link_libraries(HOWL ${TinySpline_LIBRARIES})
+target_link_libraries(HOWL ${TinySpline++_LIBRARIES})
+
 find_package(Doxygen)
 IF(DOXYGEN_FOUND)
 	configure_file(${ROOT}/doxygen.conf.in ${BUILD}/doxygen.conf @ONLY)

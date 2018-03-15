@@ -22,14 +22,15 @@
 
 #include "GooCore/GooCore.h"
 
+#include "tinysplinecpp.h"
+
 #define PLAYBACK_DEBUG 0
 
 namespace HOWL {
-	enum SmootherType {
-		SMOOTH_HOLD = 0,
-		SMOOTH_LINEAR = 1,
-		SMOOTH_BEZIER = 2,
-		SMOOTH_CONT_BEZIER = 3
+	class Interpolator {
+	public:
+		Interpolator();
+
 	};
 
 	class Layer;
@@ -49,7 +50,11 @@ namespace HOWL {
 			virtual bool operator==(Keyframe &a);
 
 			std::string name;
-			SmootherType smoother;
+
+			double smootherBefore[2];
+			double smootherAfter[2];
+			bool smootherHold;
+
 			long time;
 	};
 
