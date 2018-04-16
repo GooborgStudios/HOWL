@@ -348,7 +348,7 @@ int TimelinePanel::tickFromCol(int col) {
 }
 
 int TimelinePanel::playhead_in_pixels() {
-	return colsize * activeProject->currentTime / activeProject->ticksPerBeat * 4;
+	return colsize * activeProject->currentTime / ticksPerCol;
 }
 
 wxPoint TimelinePanel::offset_in_pixels() {
