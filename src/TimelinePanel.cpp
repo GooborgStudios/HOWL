@@ -203,8 +203,8 @@ void TimelinePanel::movePlayhead(int time) {
 void TimelinePanel::zoom(int percent) {
 	if ((ticksPerCol <= 1 && percent > 100) || (ticksPerCol >= pow(2, 27) && percent < 100)) return;
 	colsize = colsize * percent / 100;
-	if (colsize <= 10) {
-		ticksPerCol *= 4;
+	if (colsize <= 20) {
+		ticksPerCol *= 2;
 		if (ticksPerCol > pow(2, 27)) ticksPerCol = pow(2, 27);
 		else colsize = 40;
 	}
@@ -213,6 +213,7 @@ void TimelinePanel::zoom(int percent) {
 		if (ticksPerCol < 1) ticksPerCol = 1;
 		else colsize = 40;
 	}
+
 	Refresh();
 }
 
@@ -258,9 +259,9 @@ void TimelinePanel::render_header_segment(wxDC &canvas, int col, int xpos) {
 
 	// XXX This should be more efficient!
 	if (beat == 1 && div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d", measure);
-	else if (div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d.%d", measure, beat);
-	else if (tick == 1) snprintf(buf, sizeof(buf), "%d.%d.%d", measure, beat, div);
-	else snprintf(buf, sizeof(buf), "%d.%d.%d.%d", measure, beat, div, tick);
+	else if (div == 1 && tick == 1) snprintf(buf, sizeof(buf), "%d:%d", measure, beat);
+	else if (tick == 1) snprintf(buf, sizeof(buf), "%d:%d:%d", measure, beat, div);
+	else snprintf(buf, sizeof(buf), ":%d.%d", div, tick);
 	
 	canvas.DrawText(buf, xpos+4, 0);
 
