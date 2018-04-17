@@ -62,6 +62,11 @@ find_package(GooCore REQUIRED)
 include_directories(${GooCore_INCLUDE_DIR})
 target_link_libraries(HOWL ${GooCore_LIBRARIES})
 
+install(TARGETS HOWL DESTINATION lib)
+
+file(GLOB HEADERS include/*.h)
+install(FILES ${HEADERS} DESTINATION include/HOWL)
+
 find_package(Doxygen)
 IF(DOXYGEN_FOUND)
 	configure_file(${ROOT}/doxygen.conf.in ${BUILD}/doxygen.conf @ONLY)
@@ -69,7 +74,4 @@ IF(DOXYGEN_FOUND)
 	add_custom_command(OUTPUT ${BUILD}/doxygen/ COMMAND ${DOXYGEN_EXECUTABLE} ${BUILD}/doxygen.conf DEPENDS ${SRC}/* ${INCL}/* ${ROOT}/README.md ${ROOT}/doxygen.conf.in VERBATIM) # COMMENT "Generating API documentation with Doxygen"
 ENDIF(DOXYGEN_FOUND)
 
-install(TARGETS HOWL DESTINATION lib)
-
-file(GLOB HEADERS include/*.h)
-install(FILES ${HEADERS} DESTINATION include/HOWL)
+add_custom_target(distclean rm -rf ${PROJECT_BINARY_DIR}/*)
